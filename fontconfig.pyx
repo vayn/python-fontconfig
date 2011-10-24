@@ -1,7 +1,6 @@
 # file: fontconfig.pyx
 # -*- coding: utf-8; -*-
 
-from libc.stdio cimport stderr, fprintf
 from cfontconfig cimport *
 
 __license__ = 'GPLv3'
@@ -33,7 +32,6 @@ cdef class FontConfig:
     self._c_pat = FcFreeTypeQuery(<FcChar8*>file, 0, blanks, &count)
 
     if FcPatternGetCharSet(self._c_pat, FC_CHARSET, 0, &cs) != FcResultMatch:
-      fprintf(stderr, "no match\n")
       return ret
 
     FcUtf8ToUcs4(<FcChar8*>(<unsigned char*>"永"), &ch, 3)
