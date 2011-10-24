@@ -11,7 +11,13 @@ Cython_, Fontconfig_
 .. _Fontconfig: http://www.freedesktop.org/wiki/Software/fontconfig
 
 
+Compilation
+-----
+
+> python setup.py build_ext -i
+
+
 License
-------
+-----
 
 This program is released under ``GPL3`` license, see ``LICENSE`` for more detail.
