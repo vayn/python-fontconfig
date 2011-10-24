@@ -2,6 +2,8 @@
 Fontconfig Python binding
 --------------------------
 
+**Note**: This is a proof of concept at present.
+
 Requirement
 -----
 
@@ -34,4 +36,4 @@ False
 License
 -----
 
-This program is released under ``GPL3`` license, see ``LICENSE`` for more detail.
+This program is released under ``GPLv3`` license, see ``LICENSE`` for more detail.
