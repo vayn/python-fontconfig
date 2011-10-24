@@ -3,7 +3,7 @@ Fontconfig Python binding
 --------------------------
 
 Requirement
----
+-----
 
 Cython_, Fontconfig_
 
@@ -12,6 +12,6 @@ Cython_, Fontconfig_
 
 
 License
----
+------
 
 This program is released under ``GPL3`` license, see ``LICENSE`` for more detail.
