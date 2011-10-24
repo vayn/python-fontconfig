@@ -4,7 +4,7 @@
 from libc.stdio cimport stderr, fprintf
 from cfontconfig cimport *
 
-__license__ = 'GPL3'
+__license__ = 'GPLv3'
 __version__ = '0.1.0'
 
 
