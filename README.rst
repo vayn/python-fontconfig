@@ -29,7 +29,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> import fontconfig
 >>> fc = fontconfig.FontConfig()
 >>> font = b'/usr/share/fonts/truetype/freefont/FreeMono.ttf'
->>> fc.support_ch(font)
+>>> fc.support(font)
 False 
 
 
