@@ -35,10 +35,36 @@ cdef class FontConfig:
 
 
 cdef class FontPattern(FontConfig):
+  cdef public bytes lang
+  cdef public bytes ch
 
-  def families(self, lang=b'zh'):
+  def __init__(self, lang=b'zh', ch=b'永'):
+    self.lang = lang
+    self.ch = ch
+
+  cpdef bint haschar(self, char* font):
+    '''Check self.ch in the specified font'''
+    cdef:
+      int ret = 0
+      int count
+      FcChar32 ch
+      FcChar8* file = <FcChar8*>font
+
+    self._c_blanks = FcConfigGetBlanks(NULL)
+    self._c_pat = FcFreeTypeQuery(file, 0, self._c_blanks, &count)
+
+    if FcPatternGetCharSet(self._c_pat, FC_CHARSET, 0, &self._c_cs)\
+       != FcResultMatch:
+      return ret
+
+    FcUtf8ToUcs4(<FcChar8*>(<char*>self.ch), &ch, 3)
+    if FcCharSetHasChar(self._c_cs, ch):
+      ret = 1
+    return ret
+
+  def families(self):
     '''Return font-families of which support specified language'''
-    lang = b':lang=' + lang
+    lang = b':lang=' + self.lang
     cdef:
       FcChar8* strpat = <FcChar8*>(<char*>lang)
       FcChar8 *family
@@ -68,23 +94,3 @@ cdef class FontPattern(FontConfig):
         continue
       families.append((<char*>family, <char*>file))
     return families
-
-  cpdef bint support(self, char* font, char* letter='永'):
-    '''Testing the given font supports specified character'''
-    cdef:
-      int ret = 0
-      int count
-      FcChar8* file = <FcChar8*>font
-      FcChar32 ch
-
-    self._c_blanks = FcConfigGetBlanks(NULL)
-    self._c_pat = FcFreeTypeQuery(file, 0, self._c_blanks, &count)
-
-    if FcPatternGetCharSet(self._c_pat, FC_CHARSET, 0, &self._c_cs)\
-       != FcResultMatch:
-      return ret
-
-    FcUtf8ToUcs4(<FcChar8*>letter, &ch, 3)
-    if FcCharSetHasChar(self._c_cs, ch):
-      ret = 1
-    return ret
