@@ -73,7 +73,7 @@ cdef class FontPattern(FontConfig):
       object families = []
 
     self._c_pat = FcNameParse(strpat)
-    self._c_os = FcObjectSetBuild(FC_FAMILY, FC_CHARSET, FC_FILE, <char*>0)
+    self._c_os = FcObjectSetBuild(FC_FAMILY, FC_CHARSET, FC_FILE, NULL)
     self._c_fs = FcFontList(<FcConfig*>0, self._c_pat, self._c_os)
 
     if (self._c_fs is NULL) or (self._c_fs.nfont <= 0):
