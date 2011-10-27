@@ -17,19 +17,11 @@ cdef class FontConfig:
   cdef FcCharSet* _c_cs
 
   def __cinit__(self):
-    self._c_pat = FcPatternCreate()
-    self._c_blanks = FcBlanksCreate()
-    self._c_os = FcObjectSetCreate()
-    self._c_fs = FcFontSetCreate()
-
-    if self._c_pat is NULL:
-      raise MemoryError()
-    if self._c_blanks is NULL:
-      raise MemoryError()
-    if self._c_os is NULL:
-      raise MemoryError()
-    if self._c_fs is NULL:
-      raise MemoryError()
+    self._c_pat = NULL
+    self._c_blanks = NULL
+    self._c_os = NULL
+    self._c_fs = NULL
+    self._c_cs = NULL
 
   def __dealloc__(self):
     if self._c_pat is not NULL:
