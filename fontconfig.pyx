@@ -1,12 +1,13 @@
 # file: fontconfig.pyx
 # -*- coding: utf-8; -*-
-'''Python binding for fontconfig'''
+'''Python binding for Fontconfig'''
 
 import sys
 from cfontconfig cimport *
 
+__author__ = 'Vincent Tsai <vayn@vayn.de>'
 __license__ = 'GPLv3'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 
 cdef class FontConfig:
