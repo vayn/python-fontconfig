@@ -33,6 +33,10 @@ cdef class FontConfig:
     if self._c_fs is not NULL:
       FcFontSetDestroy(self._c_fs)
 
+  property version:
+    def __get__(self):
+      return FcGetVersion()
+
 
 cdef class FontPattern(FontConfig):
   cdef public bytes lang
