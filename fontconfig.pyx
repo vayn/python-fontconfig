@@ -39,12 +39,12 @@ cdef class FontConfig:
 
 
 cdef class FontPattern(FontConfig):
-  cdef public bytes ch
+  cdef public bytes flag
   cdef bytes _lang
 
-  def __init__(self, lang=b'zh', ch=b'永'):
+  def __init__(self, lang=b'zh', flag=b'永'):
     self._lang = b':lang=' + lang
-    self.ch = ch
+    self.flag = ch
 
   property lang:
     def __get__(self):
@@ -85,7 +85,7 @@ cdef class FontPattern(FontConfig):
     return info
 
   cpdef bint has_char(self, char *file):
-    '''Check if self.ch in the specified font'''
+    '''Check if self.flag in the specified font'''
     cdef:
       int ret = 0
       int count
@@ -99,7 +99,7 @@ cdef class FontPattern(FontConfig):
        != FcResultMatch:
       return ret
 
-    FcUtf8ToUcs4(<FcChar8*>(<char*>self.ch), &ch, 3)
+    FcUtf8ToUcs4(<FcChar8*>(<char*>self.flag), &ch, 3)
     if FcCharSetHasChar(self.__cs, ch):
       ret = 1
     return ret
