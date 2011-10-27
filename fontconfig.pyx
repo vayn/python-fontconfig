@@ -21,7 +21,6 @@ cdef class FontConfig:
     self._c_blanks = FcBlanksCreate()
     self._c_os = FcObjectSetCreate()
     self._c_fs = FcFontSetCreate()
-    self._c_cs = FcCharSetCreate()
 
     if self._c_pat is NULL:
       raise MemoryError()
@@ -30,8 +29,6 @@ cdef class FontConfig:
     if self._c_os is NULL:
       raise MemoryError()
     if self._c_fs is NULL:
-      raise MemoryError()
-    if self._c_cs is NULL:
       raise MemoryError()
 
   def __dealloc__(self):
