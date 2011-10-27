@@ -10,28 +10,28 @@ __version__ = '0.1.0'
 
 
 cdef class FontConfig:
-  cdef FcPattern* _c_pat
-  cdef FcBlanks* _c_blanks
-  cdef FcObjectSet* _c_os
-  cdef FcFontSet* _c_fs
-  cdef FcCharSet* _c_cs
+  cdef FcPattern *__pat
+  cdef FcBlanks *__blanks
+  cdef FcObjectSet *__os
+  cdef FcFontSet *__fs
+  cdef FcCharSet *__cs
 
   def __cinit__(self):
-    self._c_pat = NULL
-    self._c_blanks = NULL
-    self._c_os = NULL
-    self._c_fs = NULL
-    self._c_cs = NULL
+    self.__pat = NULL
+    self.__blanks = NULL
+    self.__os = NULL
+    self.__fs = NULL
+    self.__cs = NULL
 
   def __dealloc__(self):
-    if self._c_pat is not NULL:
-      FcPatternDestroy(self._c_pat)
-    if self._c_blanks is not NULL:
-      FcBlanksDestroy(self._c_blanks)
-    if self._c_os is not NULL:
-      FcObjectSetDestroy(self._c_os)
-    if self._c_fs is not NULL:
-      FcFontSetDestroy(self._c_fs)
+    if self.__pat is not NULL:
+      FcPatternDestroy(self.__pat)
+    if self.__blanks is not NULL:
+      FcBlanksDestroy(self.__blanks)
+    if self.__os is not NULL:
+      FcObjectSetDestroy(self.__os)
+    if self.__fs is not NULL:
+      FcFontSetDestroy(self.__fs)
 
   property version:
     def __get__(self):
@@ -39,62 +39,99 @@ cdef class FontConfig:
 
 
 cdef class FontPattern(FontConfig):
-  cdef public bytes lang
   cdef public bytes ch
+  cdef bytes _lang
 
   def __init__(self, lang=b'zh', ch=b'永'):
-    self.lang = lang
+    self._lang = b':lang=' + lang
     self.ch = ch
 
-  cpdef bint haschar(self, char* font):
-    '''Check self.ch in the specified font'''
+  property lang:
+    def __get__(self):
+      return self._lang.split(b'=', 1)[1]
+    def __set__(self, value):
+      self._lang = b':lang=' + value
+
+  def get_info(self, char *file):
+    '''Get details of the specified font'''
+    cdef:
+      int count
+      FcChar8 *f = <FcChar8*>file
+      FcChar8 *family
+      FcChar8 *style
+      FcChar8 *stylelang
+      FcChar8 *fontformat
+      FcChar32 ch
+      object info = {}
+
+    self.__blanks = FcConfigGetBlanks(NULL)
+    self.__pat = FcFreeTypeQuery(f, 0, self.__blanks, &count)
+
+    if FcPatternGetString(self.__pat, FC_FAMILY, 1, &family)\
+       == FcResultMatch:
+      info.update({'family': <char*>family})
+    elif FcPatternGetString(self.__pat, FC_FAMILY, 0, &family)\
+       == FcResultMatch:
+      info.update({'family': <char*>family})
+
+    if FcPatternGetString(self.__pat, FC_STYLE, 0, &style)\
+       == FcResultMatch:
+      info.update({'style': <char*>style})
+
+    if FcPatternGetString(self.__pat, FC_FONTFORMAT, 0, &fontformat)\
+       == FcResultMatch:
+      info.update({'fontformat': <char*>fontformat})
+
+    return info
+
+  cpdef bint has_char(self, char *file):
+    '''Check if self.ch in the specified font'''
     cdef:
       int ret = 0
       int count
       FcChar32 ch
-      FcChar8* file = <FcChar8*>font
+      FcChar8 *f = <FcChar8*>file
 
-    self._c_blanks = FcConfigGetBlanks(NULL)
-    self._c_pat = FcFreeTypeQuery(file, 0, self._c_blanks, &count)
+    self.__blanks = FcConfigGetBlanks(NULL)
+    self.__pat = FcFreeTypeQuery(f, 0, self.__blanks, &count)
 
-    if FcPatternGetCharSet(self._c_pat, FC_CHARSET, 0, &self._c_cs)\
+    if FcPatternGetCharSet(self.__pat, FC_CHARSET, 0, &self.__cs)\
        != FcResultMatch:
       return ret
 
     FcUtf8ToUcs4(<FcChar8*>(<char*>self.ch), &ch, 3)
-    if FcCharSetHasChar(self._c_cs, ch):
+    if FcCharSetHasChar(self.__cs, ch):
       ret = 1
     return ret
 
-  def families(self):
-    '''Return font-families of which support specified language'''
-    lang = b':lang=' + self.lang
+  def get_list(self):
+    '''Return font list of which support specified language'''
     cdef:
-      FcChar8* strpat = <FcChar8*>(<char*>lang)
+      FcChar8* strpat = <FcChar8*>(<char*>self._lang)
       FcChar8 *family
       FcChar8 *file
       FcChar32 ch
-      object families = []
+      object lst = []
 
-    self._c_pat = FcNameParse(strpat)
-    self._c_os = FcObjectSetBuild(FC_FAMILY, FC_CHARSET, FC_FILE, NULL)
-    self._c_fs = FcFontList(<FcConfig*>0, self._c_pat, self._c_os)
+    self.__pat = FcNameParse(strpat)
+    self.__os = FcObjectSetBuild(FC_FAMILY, FC_CHARSET, FC_FILE, NULL)
+    self.__fs = FcFontList(<FcConfig*>0, self.__pat, self.__os)
 
-    if (self._c_fs is NULL) or (self._c_fs.nfont <= 0):
-      return families
+    if (self.__fs is NULL) or (self.__fs.nfont <= 0):
+      return lst
 
     cdef int i
-    for i in range(self._c_fs.nfont):
-      if FcPatternGetCharSet(self._c_fs.fonts[i], FC_CHARSET, 0, &self._c_cs)\
+    for i in range(self.__fs.nfont):
+      if FcPatternGetCharSet(self.__fs.fonts[i], FC_CHARSET, 0, &self.__cs)\
          != FcResultMatch:
         continue
-      if FcPatternGetString(self._c_fs.fonts[i], FC_FAMILY, 1, &family)\
+      if FcPatternGetString(self.__fs.fonts[i], FC_FAMILY, 1, &family)\
          != FcResultMatch:
-        if FcPatternGetString(self._c_fs.fonts[i], FC_FAMILY, 0, &family)\
+        if FcPatternGetString(self.__fs.fonts[i], FC_FAMILY, 0, &family)\
            != FcResultMatch:
           continue
-      if FcPatternGetString(self._c_fs.fonts[i], FC_FILE, 0, &file)\
+      if FcPatternGetString(self.__fs.fonts[i], FC_FILE, 0, &file)\
          != FcResultMatch:
         continue
-      families.append((<char*>family, <char*>file))
-    return families
+      lst.append((<char*>family, <char*>file))
+    return lst
