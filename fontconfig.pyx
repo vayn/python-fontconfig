@@ -33,7 +33,7 @@ cdef class FontConfig:
     if self._c_fs is not NULL:
       FcFontSetDestroy(self._c_fs)
 
-  cpdef object families(self):
+  def families(self):
     '''Return font-families of which support Chinese'''
     cdef:
       FcChar8* strpat = <FcChar8*>(<unsigned char*>":lang=zh")
