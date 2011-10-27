@@ -35,12 +35,6 @@ cdef class FontConfig:
 
 
 cdef class FontPattern(FontConfig):
-  def __cinit__(self):
-    self._c_pat = NULL
-    self._c_blanks = NULL
-    self._c_os = NULL
-    self._c_fs = NULL
-    self._c_cs = NULL
 
   def families(self, lang=b'zh'):
     '''Return font-families of which support specified language'''
