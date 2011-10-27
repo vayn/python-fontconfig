@@ -44,7 +44,7 @@ cdef class FontPattern(FontConfig):
 
   def __init__(self, lang=b'zh', flag=b'永'):
     self._lang = b':lang=' + lang
-    self.flag = ch
+    self.flag = flag
 
   property lang:
     def __get__(self):
