@@ -43,8 +43,6 @@ cdef class FontConfig:
       FcObjectSetDestroy(self._c_os)
     if self._c_fs is not NULL:
       FcFontSetDestroy(self._c_fs)
-    if self._c_cs is not NULL:
-      FcCharSetDestroy(self._c_cs)
 
   cpdef object families(self):
     '''Return font-families of which support Chinese'''
@@ -65,16 +63,16 @@ cdef class FontConfig:
     FcUtf8ToUcs4(<FcChar8*>(<unsigned char*>"永"), &ch, 3)
     cdef int i
     for i in range(self._c_fs.nfont):
-      if FcPatternGetCharSet(self._c_fs.fonts[i], FC_CHARSET, 0,
-                             &self._c_cs) != FcResultMatch:
+      if FcPatternGetCharSet(self._c_fs.fonts[i], FC_CHARSET, 0, &self._c_cs)\
+         != FcResultMatch:
         continue
-      if FcPatternGetString(self._c_fs.fonts[i], FC_FAMILY, 1,
-                            &family) != FcResultMatch:
-        if FcPatternGetString(self._c_fs.fonts[i], FC_FAMILY, 0,
-                              &family) != FcResultMatch:
+      if FcPatternGetString(self._c_fs.fonts[i], FC_FAMILY, 1, &family)\
+         != FcResultMatch:
+        if FcPatternGetString(self._c_fs.fonts[i], FC_FAMILY, 0, &family)\
+           != FcResultMatch:
           continue
-      if FcPatternGetString(self._c_fs.fonts[i], FC_FILE, 0,
-                            &file) != FcResultMatch:
+      if FcPatternGetString(self._c_fs.fonts[i], FC_FILE, 0, &file)\
+         != FcResultMatch:
         continue
       if FcCharSetHasChar(self._c_cs, ch):
         families.append((<char*>family, <char*>file))
@@ -89,10 +87,10 @@ cdef class FontConfig:
       FcChar32 ch
 
     self._c_blanks = FcConfigGetBlanks(NULL)
-    self._c_pat = FcFreeTypeQuery(<FcChar8*>file, 0, self._c_blanks, &count)
+    self._c_pat = FcFreeTypeQuery(file, 0, self._c_blanks, &count)
 
-    if FcPatternGetCharSet(self._c_pat, FC_CHARSET, 0,
-                           &self._c_cs) != FcResultMatch:
+    if FcPatternGetCharSet(self._c_pat, FC_CHARSET, 0, &self._c_cs)\
+       != FcResultMatch:
       return ret
 
     FcUtf8ToUcs4(<FcChar8*>(<unsigned char*>"永"), &ch, 3)
