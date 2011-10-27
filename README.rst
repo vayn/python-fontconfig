@@ -26,11 +26,14 @@ Usage
 Python 3.2.2 (default, Sep  5 2011, 04:52:19) 
 [GCC 4.6.1 20110819 (prerelease)] on linux2
 Type "help", "copyright", "credits" or "license" for more information.
->>> import fontconfig
->>> fc = fontconfig.FontConfig()
+>>> from fontconfig import FontPattern
+>>> fc = FontPattern(lang=b'zh', ch=bytes('永', 'utf8'))
 >>> font = b'/usr/share/fonts/truetype/freefont/FreeMono.ttf'
->>> fc.support(font)
+>>> fc.haschar(font)
 False 
+>>> fc.ch = b'font'
+>>> fc.haschar(font)
+True
 
 
 License
