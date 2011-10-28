@@ -1,14 +1,25 @@
-# file: fontconfig.pyx
-# -*- coding: utf-8; -*-
+# -*- coding: utf-8
+# @Author: Vayn a.k.a. VT <vayn@vayn.de>
+# @Name: fontconfig.pyx
+# @Date: 2011年10月28日 星期五 08时22分37秒
+
 '''Python binding for Fontconfig'''
+
+#------------------------------------------------
+# Imports
+#------------------------------------------------
 
 import sys
 from cfontconfig cimport *
 
-__author__ = 'Vincent Tsai <vayn@vayn.de>'
+__author__ = 'Vayn a.k.a VT <vayn@vayn.de>'
 __license__ = 'GPLv3'
 __version__ = '0.2.0'
 
+
+#------------------------------------------------
+# Code
+#------------------------------------------------
 
 cdef class FontConfig:
   cdef FcPattern *__pat
@@ -40,8 +51,24 @@ cdef class FontConfig:
 
 
 cdef class FontPattern(FontConfig):
-  cdef public bytes flag
-  cdef bytes _lang
+  '''FcPattern related class
+
+  >>> fc = FontPattern(lang=b'zh', flag=bytes('永', 'utf8'))
+  >>> fc.flag.decode('utf8')
+  永
+  >>> fc.lang
+  b'zh'
+  >>> fc.version  # Fontconfig version, 2.8.0
+  20800
+  >>> font = b'/usr/share/fonts/truetype/freefont/FreeMono.ttf'
+  >>> fc.has_char(font)
+  False
+  >>> fc.flag = b'forever'
+  >>> fc.flag
+  b'forever'
+  >>> fc.has_char(font)
+  True
+  '''
 
   def __init__(self, lang=b'zh', flag=b'永'):
     self._lang = b':lang=' + lang
@@ -60,7 +87,6 @@ cdef class FontPattern(FontConfig):
       FcChar8 *f = <FcChar8*>file
       FcChar8 *family
       FcChar8 *style
-      FcChar8 *stylelang
       FcChar8 *fontformat
       FcChar32 ch
       object info = {}
