@@ -25,6 +25,8 @@ _________
 Installation
 ============
 
+>>> git clone git://github.com/Vayn/python-fontconfig.git
+>>> cd python-fontconfig/
 >>> python setup.py install
 
 
