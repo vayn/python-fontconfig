@@ -4,6 +4,8 @@ Python-fontconfig
 
 Python bindings for Fontconfig_ library
 
+Note: this is a proof of concept at present. If you want to join us, please fork and hack it!
+
 Requirement
 ==========
 
@@ -29,7 +31,7 @@ Installation
 Building C source
 =================
 
->>> python build.py build_ext -i 
+>>> python setup.py build_ext -i 
 
 
 Demo
