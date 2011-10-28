@@ -134,7 +134,7 @@ cdef class FontPattern(FontConfig):
   def get_list(self):
     '''Return font list of which support specified language'''
     cdef:
-      FcChar8* strpat = <FcChar8*>(<char*>self._lang)
+      FcChar8 *strpat = <FcChar8*>(<char*>self._lang)
       FcChar8 *family
       FcChar8 *file
       FcChar32 ch
