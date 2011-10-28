@@ -1,26 +1,39 @@
---------------------------
-Fontconfig Python binding
---------------------------
+-----------------
+Python-fontconfig
+-----------------
 
-**Note**: This is a proof of concept at present.
+Python bindings for Fontconfig_ library
 
 Requirement
------
+==========
 
-Cython_, Fontconfig_
+- Fontconfig_ **Required**
+- Cython_ (if you want to regenerate C source)
 
 .. _Cython: http://cython.org/
 .. _Fontconfig: http://www.freedesktop.org/wiki/Software/fontconfig
 
+Tested on
+_________
 
-Compilation
------
+- ``Python 2.7.2`` (64-bit)
+- ``Python 3.2.2`` (64-bit)
+
+
+Installation
+============
+
+>>> python setup.py install
+
+
+Re-compilation
+==============
 
 >>> python setup.py build_ext -i 
 
 
 Usage
------
+=====
 
 >>> python
 Python 3.2.2 (default, Sep  5 2011, 04:52:19) 
@@ -56,6 +69,6 @@ True
 
 
 License
------
+=======
 
 This program is released under ``GPLv3`` license, see ``LICENSE`` for more detail.
