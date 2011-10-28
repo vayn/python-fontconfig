@@ -32,8 +32,8 @@ Re-compilation
 >>> python setup.py build_ext -i 
 
 
-Usage
-=====
+Demo
+====
 
 >>> python
 Python 3.2.2 (default, Sep  5 2011, 04:52:19) 
