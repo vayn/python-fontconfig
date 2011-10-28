@@ -1,6 +1,11 @@
-# file: cfontconfig.pxd
-# -*- coding: utf-8; -*-
+# -*- coding: utf-8
 # @Author: Vincent Tsai <vayn@vayn.de>
+# @Name: cfontconfig.pxd
+# @Date: 2011年 10月 28日 星期五 08:23:02 CST
+
+#-----------------------------------------------
+# Code
+#-----------------------------------------------
 
 cdef extern from "fontconfig/fontconfig.h":
 
