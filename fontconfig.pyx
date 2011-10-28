@@ -69,6 +69,8 @@ cdef class FontPattern(FontConfig):
   >>> fc.has_char(font)
   True
   '''
+  cdef public bytes flag
+  cdef bytes _lang
 
   def __init__(self, lang=b'zh', flag=b'永'):
     self._lang = b':lang=' + lang
