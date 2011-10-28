@@ -26,10 +26,10 @@ Installation
 >>> python setup.py install
 
 
-Re-compilation
-==============
+Building C source
+=================
 
->>> python setup.py build_ext -i 
+>>> python build.py build_ext -i 
 
 
 Demo
