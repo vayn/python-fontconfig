@@ -22,38 +22,9 @@ __version__ = '0.2.0'
 #------------------------------------------------
 
 cdef class FontConfig:
-  cdef FcPattern *__pat
-  cdef FcBlanks *__blanks
-  cdef FcObjectSet *__os
-  cdef FcFontSet *__fs
-  cdef FcCharSet *__cs
+  '''FontConfig
 
-  def __cinit__(self):
-    self.__pat = NULL
-    self.__blanks = NULL
-    self.__os = NULL
-    self.__fs = NULL
-    self.__cs = NULL
-
-  def __dealloc__(self):
-    if self.__pat is not NULL:
-      FcPatternDestroy(self.__pat)
-    if self.__blanks is not NULL:
-      FcBlanksDestroy(self.__blanks)
-    if self.__os is not NULL:
-      FcObjectSetDestroy(self.__os)
-    if self.__fs is not NULL:
-      FcFontSetDestroy(self.__fs)
-
-  property version:
-    def __get__(self):
-      return FcGetVersion()
-
-
-cdef class FontPattern(FontConfig):
-  '''FcPattern related class
-
-  >>> fc = FontPattern(lang=b'zh', flag=bytes('永', 'utf8'))
+  >>> fc = FontConfig(lang=b'zh', flag=bytes('永', 'utf8'))
   >>> fc.flag.decode('utf8')
   永
   >>> fc.lang
@@ -69,12 +40,38 @@ cdef class FontPattern(FontConfig):
   >>> fc.has_char(font)
   True
   '''
+  cdef FcPattern *__pat
+  cdef FcBlanks *__blanks
+  cdef FcObjectSet *__os
+  cdef FcFontSet *__fs
+  cdef FcCharSet *__cs
   cdef public bytes flag
   cdef bytes _lang
+
+  def __cinit__(self):
+    self.__pat = NULL
+    self.__blanks = NULL
+    self.__os = NULL
+    self.__fs = NULL
+    self.__cs = NULL
 
   def __init__(self, lang=b'zh', flag=b'永'):
     self._lang = b':lang=' + lang
     self.flag = flag
+
+  def __dealloc__(self):
+    if self.__pat is not NULL:
+      FcPatternDestroy(self.__pat)
+    if self.__blanks is not NULL:
+      FcBlanksDestroy(self.__blanks)
+    if self.__os is not NULL:
+      FcObjectSetDestroy(self.__os)
+    if self.__fs is not NULL:
+      FcFontSetDestroy(self.__fs)
+
+  property version:
+    def __get__(self):
+      return FcGetVersion()
 
   property lang:
     def __get__(self):
@@ -82,7 +79,7 @@ cdef class FontPattern(FontConfig):
     def __set__(self, value):
       self._lang = b':lang=' + value
 
-  def get_info(self, char *file):
+  def fc_query(self, char *file):
     '''Get details of the specified font'''
     cdef:
       int count
