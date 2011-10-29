@@ -3,8 +3,6 @@
 # @Name: fontconfig.pyx
 # @Date: 2011年10月28日 星期五 08时22分37秒
 
-'''Python binding for Fontconfig'''
-
 #------------------------------------------------
 # Imports
 #------------------------------------------------
@@ -21,8 +19,16 @@ __version__ = '0.2.0'
 # Code
 #------------------------------------------------
 
+class FcInitError(Exception):
+  def __init__(self):
+    self.value = "Can't init font config library"
+
+  def __str__(self):
+    return repr(self.value)
+
+
 cdef class FontConfig:
-  '''FontConfig
+  '''Python binding for Fontconfig
 
   >>> fc = FontConfig(lang=b'zh')
   >>> fc.lang
@@ -45,7 +51,7 @@ cdef class FontConfig:
 
   def __cinit__(self, lang=b'zh'):
     if not FcInit():
-      raise Exception('')
+      raise FcInitError
     self._lang = b':lang=' + lang
 
   def __dealloc__(self):
