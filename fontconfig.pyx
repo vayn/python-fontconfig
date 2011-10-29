@@ -24,20 +24,16 @@ __version__ = '0.2.0'
 cdef class FontConfig:
   '''FontConfig
 
-  >>> fc = FontConfig(lang=b'zh', flag=bytes('永', 'utf8'))
-  >>> fc.flag.decode('utf8')
-  永
+  >>> fc = FontConfig(lang=b'zh')
   >>> fc.lang
   b'zh'
   >>> fc.version  # Fontconfig version, 2.8.0
   20800
   >>> font = b'/usr/share/fonts/truetype/freefont/FreeMono.ttf'
-  >>> fc.has_char(font)
+  >>> fc.has_char(font, b'永')
   False
-  >>> fc.flag = b'forever'
-  >>> fc.flag
   b'forever'
-  >>> fc.has_char(font)
+  >>> fc.has_char(font, b'永')
   True
   '''
   cdef FcPattern *__pat
@@ -45,17 +41,11 @@ cdef class FontConfig:
   cdef FcObjectSet *__os
   cdef FcFontSet *__fs
   cdef FcCharSet *__cs
-  cdef public bytes flag
   cdef bytes _lang
 
-  def __cinit__(self):
-    self.__pat = NULL
-    self.__blanks = NULL
-    self.__os = NULL
-    self.__fs = NULL
-    self.__cs = NULL
-
-  def __init__(self, lang=b'zh'):
+  def __cinit__(self, lang=b'zh'):
+    if not FcInit():
+      raise Exception('')
     self._lang = b':lang=' + lang
 
   def __dealloc__(self):
@@ -79,7 +69,7 @@ cdef class FontConfig:
       self._lang = b':lang=' + value
 
   cpdef bint has_char(self, char *file, char *ch):
-    '''Check if self.flag in the specified font'''
+    '''Check if character in the specified font'''
     cdef:
       int ret = 0
       int count

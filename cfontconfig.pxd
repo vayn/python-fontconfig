@@ -68,3 +68,4 @@ cdef extern from "fontconfig/fontconfig.h":
   FcResult FcPatternGetDouble(FcPattern *, char *, int, double *)
   int FcGetVersion()
   int FcUtf8ToUcs4(FcChar8 *, FcChar32 *, int)
+  bint FcInit()
