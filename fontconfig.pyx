@@ -63,6 +63,7 @@ cdef class FontConfig:
       FcObjectSetDestroy(self.__os)
     if self.__fs is not NULL:
       FcFontSetDestroy(self.__fs)
+    FcFini()
 
   property version:
     def __get__(self):
