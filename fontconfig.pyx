@@ -7,7 +7,6 @@
 # Imports
 #------------------------------------------------
 
-import sys
 from cfontconfig cimport *
 
 __author__ = 'Vayn a.k.a VT <vayn@vayn.de>'
@@ -30,7 +29,7 @@ class FcInitError(Exception):
 cdef class FontConfig:
   '''Python binding for Fontconfig
 
-  >>> fc = FontConfig(lang=b'zh')
+  >>> fc = FontConfig(lang=b':lang=zh')
   >>> fc.lang
   b'zh'
   >>> fc.version  # Fontconfig version, 2.8.0
@@ -38,7 +37,7 @@ cdef class FontConfig:
   >>> font = b'/usr/share/fonts/truetype/freefont/FreeMono.ttf'
   >>> fc.has_char(font, b'永')
   False
-  b'forever'
+  >>> font = b'/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'
   >>> fc.has_char(font, b'永')
   True
   '''
@@ -47,13 +46,13 @@ cdef class FontConfig:
   cdef FcObjectSet *__os
   cdef FcFontSet *__fs
   cdef FcCharSet *__cs
-  cdef bytes _lang
+  cdef public bytes lang
 
-  def __cinit__(self, lang=b'zh'):
+  def __cinit__(self, lang=b':lang=zh'):
     if not FcInit():
       raise FcInitError
     FcFini()
-    self._lang = b':lang=' + lang
+    self.lang = lang
 
   def __dealloc__(self):
     if self.__pat is not NULL:
@@ -68,12 +67,6 @@ cdef class FontConfig:
   property version:
     def __get__(self):
       return FcGetVersion()
-
-  property lang:
-    def __get__(self):
-      return self._lang.split(b'=', 1)[1]
-    def __set__(self, value):
-      self._lang = b':lang=' + value
 
   cpdef bint has_char(self, char *file, char *ch):
     '''Check if character in the specified font'''
@@ -102,49 +95,52 @@ cdef class FontConfig:
       FcChar8 *f = <FcChar8*>file
       FcChar8 *v
       FcChar32 ch
-      dict d = {}
-      list l = []
+      dict ret = {}
+      list lst = []
 
     self.__blanks = FcConfigGetBlanks(NULL)
     self.__pat = FcFreeTypeQuery(f, 0, self.__blanks, &count)
 
     while 1:
       if FcPatternGetString(self.__pat, FC_FAMILY, id, &v) == FcResultMatch:
-        l.append(<char*>v)
+        lst.append(<char*>v)
         id += 1
       else:
-        d.update({'family': l})
+        ret.update({'family': lst})
         break
 
     id = 0
     l = []
     while 1:
       if FcPatternGetString(self.__pat, FC_STYLE, id, &v) == FcResultMatch:
-        l.append(<char*>v)
+        lst.append(<char*>v)
         id += 1
       else:
-        d.update({'style': l})
+        ret.update({'style': lst})
         break
 
     id = 0
     l = []
     while 1:
       if FcPatternGetString(self.__pat, FC_FONTFORMAT, id, &v) == FcResultMatch:
-        l.append(<char*>v)
+        lst.append(<char*>v)
         id += 1
       else:
-        d.update({'fontformat': l})
+        ret.update({'fontformat': lst})
         break
-    return d
+    return ret
 
-  def fc_list(self):
+  def fc_list(self, lang=None):
     '''Return font list of which support specified language'''
     cdef:
-      FcChar8 *strpat = <FcChar8*>(<char*>self._lang)
+      FcChar8 *strpat = <FcChar8*>(<char*>self.lang)
       FcChar8 *family
       FcChar8 *file
       FcChar32 ch
       list lst = []
+
+    if lang is not None:
+      strpat = <FcChar8*>(<char*>lang)
 
     self.__pat = FcNameParse(strpat)
     self.__os = FcObjectSetBuild(FC_FAMILY, FC_CHARSET, FC_FILE, NULL)
