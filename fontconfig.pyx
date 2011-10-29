@@ -92,38 +92,39 @@ cdef class FontConfig:
     cdef:
       int id = 0
       int count
-      FcChar8 *f = <FcChar8*>file
-      FcChar8 *v
+      FcChar8 *font = <FcChar8*>file
+      FcChar8 *var
       FcChar32 ch
       dict ret = {}
       list lst = []
 
     self.__blanks = FcConfigGetBlanks(NULL)
-    self.__pat = FcFreeTypeQuery(f, 0, self.__blanks, &count)
+    self.__pat = FcFreeTypeQuery(font, 0, self.__blanks, &count)
 
     while 1:
-      if FcPatternGetString(self.__pat, FC_FAMILY, id, &v) == FcResultMatch:
-        lst.append(<char*>v)
+      if FcPatternGetString(self.__pat, FC_FAMILY, id, &var) == FcResultMatch:
+        lst.append(<char*>var)
         id += 1
       else:
         ret.update({'family': lst})
         break
 
     id = 0
-    l = []
+    lst = []
     while 1:
-      if FcPatternGetString(self.__pat, FC_STYLE, id, &v) == FcResultMatch:
-        lst.append(<char*>v)
+      if FcPatternGetString(self.__pat, FC_STYLE, id, &var) == FcResultMatch:
+        lst.append(<char*>var)
         id += 1
       else:
         ret.update({'style': lst})
         break
 
     id = 0
-    l = []
+    lst = []
     while 1:
-      if FcPatternGetString(self.__pat, FC_FONTFORMAT, id, &v) == FcResultMatch:
-        lst.append(<char*>v)
+      if FcPatternGetString(self.__pat, FC_FONTFORMAT, id, &var)\
+         == FcResultMatch:
+        lst.append(<char*>var)
         id += 1
       else:
         ret.update({'fontformat': lst})
