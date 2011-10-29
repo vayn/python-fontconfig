@@ -97,34 +97,45 @@ cdef class FontConfig:
   def fc_query(self, char *file):
     '''Get details of the specified font'''
     cdef:
+      int id = 0
       int count
       FcChar8 *f = <FcChar8*>file
-      FcChar8 *family
-      FcChar8 *style
-      FcChar8 *fontformat
+      FcChar8 *v
       FcChar32 ch
-      object info = {}
+      dict d = {}
+      list l = []
 
     self.__blanks = FcConfigGetBlanks(NULL)
     self.__pat = FcFreeTypeQuery(f, 0, self.__blanks, &count)
-    print(count)
 
-    if FcPatternGetString(self.__pat, FC_FAMILY, 1, &family)\
-       == FcResultMatch:
-      info.update({'family': <char*>family})
-    elif FcPatternGetString(self.__pat, FC_FAMILY, 0, &family)\
-       == FcResultMatch:
-      info.update({'family': <char*>family})
+    while 1:
+      if FcPatternGetString(self.__pat, FC_FAMILY, id, &v) == FcResultMatch:
+        l.append(<char*>v)
+        id += 1
+      else:
+        d.update({'family': l})
+        break
 
-    if FcPatternGetString(self.__pat, FC_STYLE, 0, &style)\
-       == FcResultMatch:
-      info.update({'style': <char*>style})
+    id = 0
+    l = []
+    while 1:
+      if FcPatternGetString(self.__pat, FC_STYLE, id, &v) == FcResultMatch:
+        l.append(<char*>v)
+        id += 1
+      else:
+        d.update({'style': l})
+        break
 
-    if FcPatternGetString(self.__pat, FC_FONTFORMAT, 0, &fontformat)\
-       == FcResultMatch:
-      info.update({'fontformat': <char*>fontformat})
-
-    return info
+    id = 0
+    l = []
+    while 1:
+      if FcPatternGetString(self.__pat, FC_FONTFORMAT, id, &v) == FcResultMatch:
+        l.append(<char*>v)
+        id += 1
+      else:
+        d.update({'fontformat': l})
+        break
+    return d
 
   def fc_list(self):
     '''Return font list of which support specified language'''
@@ -133,7 +144,7 @@ cdef class FontConfig:
       FcChar8 *family
       FcChar8 *file
       FcChar32 ch
-      object lst = []
+      list lst = []
 
     self.__pat = FcNameParse(strpat)
     self.__os = FcObjectSetBuild(FC_FAMILY, FC_CHARSET, FC_FILE, NULL)
