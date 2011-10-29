@@ -4,7 +4,6 @@ Python-fontconfig
 
 Python bindings for Fontconfig_ library
 
-Note: this is a proof of concept at present. If you want to join us, please fork and hack it!
 
 Requirement
 ==========
@@ -43,8 +42,8 @@ Demo
 Python 3.2.2 (default, Sep  5 2011, 04:52:19) 
 [GCC 4.6.1 20110819 (prerelease)] on linux2
 Type "help", "copyright", "credits" or "license" for more information.
->>> from fontconfig import FontPattern
->>> fc = FontPattern(lang=b'zh', flag=bytes('永', 'utf8'))
+>>> from fontconfig import FontConfig
+>>> fc = FontConfig(lang=b'zh', flag=bytes('永', 'utf8'))
 >>> fc.flag.decode('utf8')
 永
 >>> fc.lang

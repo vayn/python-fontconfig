@@ -55,9 +55,8 @@ cdef class FontConfig:
     self.__fs = NULL
     self.__cs = NULL
 
-  def __init__(self, lang=b'zh', flag=b'永'):
+  def __init__(self, lang=b'zh'):
     self._lang = b':lang=' + lang
-    self.flag = flag
 
   def __dealloc__(self):
     if self.__pat is not NULL:
@@ -78,6 +77,25 @@ cdef class FontConfig:
       return self._lang.split(b'=', 1)[1]
     def __set__(self, value):
       self._lang = b':lang=' + value
+
+  cpdef bint has_char(self, char *file, char *ch):
+    '''Check if self.flag in the specified font'''
+    cdef:
+      int ret = 0
+      int count
+      FcChar32 uscch
+
+    self.__blanks = FcConfigGetBlanks(NULL)
+    self.__pat = FcFreeTypeQuery(<FcChar8*>file, 0, self.__blanks, &count)
+
+    if FcPatternGetCharSet(self.__pat, FC_CHARSET, 0, &self.__cs)\
+       != FcResultMatch:
+      return ret
+
+    FcUtf8ToUcs4(<FcChar8*>ch, &uscch, 3)
+    if FcCharSetHasChar(self.__cs, uscch):
+      ret = 1
+    return ret
 
   def fc_query(self, char *file):
     '''Get details of the specified font'''
@@ -110,27 +128,7 @@ cdef class FontConfig:
 
     return info
 
-  cpdef bint has_char(self, char *file):
-    '''Check if self.flag in the specified font'''
-    cdef:
-      int ret = 0
-      int count
-      FcChar32 ch
-      FcChar8 *f = <FcChar8*>file
-
-    self.__blanks = FcConfigGetBlanks(NULL)
-    self.__pat = FcFreeTypeQuery(f, 0, self.__blanks, &count)
-
-    if FcPatternGetCharSet(self.__pat, FC_CHARSET, 0, &self.__cs)\
-       != FcResultMatch:
-      return ret
-
-    FcUtf8ToUcs4(<FcChar8*>(<char*>self.flag), &ch, 3)
-    if FcCharSetHasChar(self.__cs, ch):
-      ret = 1
-    return ret
-
-  def get_list(self):
+  def fc_list(self):
     '''Return font list of which support specified language'''
     cdef:
       FcChar8 *strpat = <FcChar8*>(<char*>self._lang)
