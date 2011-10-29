@@ -52,6 +52,7 @@ cdef class FontConfig:
   def __cinit__(self, lang=b'zh'):
     if not FcInit():
       raise FcInitError
+    FcFini()
     self._lang = b':lang=' + lang
 
   def __dealloc__(self):
@@ -63,7 +64,6 @@ cdef class FontConfig:
       FcObjectSetDestroy(self.__os)
     if self.__fs is not NULL:
       FcFontSetDestroy(self.__fs)
-    FcFini()
 
   property version:
     def __get__(self):
@@ -107,6 +107,7 @@ cdef class FontConfig:
 
     self.__blanks = FcConfigGetBlanks(NULL)
     self.__pat = FcFreeTypeQuery(f, 0, self.__blanks, &count)
+    print(count)
 
     if FcPatternGetString(self.__pat, FC_FAMILY, 1, &family)\
        == FcResultMatch:
