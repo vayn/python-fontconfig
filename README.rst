@@ -4,6 +4,7 @@ Python-fontconfig
 
 Python bindings for Fontconfig_ library
 
+**README is temporarily deprecated**
 
 Requirement
 ==========
