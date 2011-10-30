@@ -10,16 +10,30 @@
 cdef extern from "fontconfig/fontconfig.h":
 
   cdef char *FC_FAMILY 'FC_FAMILY'
+  cdef char *FC_FAMILYLANG 'FC_FAMILYLANG'
   cdef char *FC_FILE 'FC_FILE'
   cdef char *FC_CHARSET 'FC_CHARSET'
+  cdef char *FC_FOUNDRY 'FC_FOUNDRY'
+  cdef char *FC_SLANT 'FC_SLANT'
   cdef char *FC_STYLE 'FC_STYLE'
+  cdef char *FC_LANG 'FC_LANG'
+  cdef char *FC_STYLELANG 'FC_STYLELANG'
+  cdef char *FC_FULLNAME 'FC_FULLNAME'
+  cdef char *FC_FULLNAMELANG 'FC_FULLNAMELANG'
   cdef char *FC_FONTFORMAT 'FC_FONTFORMAT'
-
+  cdef char *FC_INDEX 'FC_INDEX'
+  cdef char *FC_WEIGHT 'FC_WEIGHT'
+  cdef char *FC_WIDTH 'FC_WIDTH'
+  cdef char *FC_SPACING 'FC_SPACING'
+  cdef char *FC_CAPABILITY 'FC_CAPABILITY'
+  cdef char *FC_SCALABLE 'FC_SCALABLE'
+  cdef char *FC_OUTLINE 'FC_OUTLINE'
+  cdef char *FC_DECORATIVE 'FC_DECORATIVE'
   ctypedef unsigned char FcChar8
   ctypedef unsigned char FcChar32
   ctypedef bint FcBool
 
-  ctypedef enum FcResult '_FcResult':
+  ctypedef enum FcResult 'FcResult':
     FcResultMatch
     FcResultNoMatch
     FcResultTypeMismatch
@@ -36,6 +50,8 @@ cdef extern from "fontconfig/fontconfig.h":
     int nfont
     int sfont
     FcPattern **fonts
+  ctypedef struct FcValue:
+    pass
   ctypedef struct FcObjectSet:
     pass
   ctypedef struct FcPattern:
@@ -63,11 +79,12 @@ cdef extern from "fontconfig/fontconfig.h":
   void FcCharSetDestroy(FcCharSet *)
 
   FcBool FcCharSetHasChar(FcCharSet *, FcChar32)
+  FcResult FcPatternGet(FcPattern *, char *, int, FcValue *)
   FcResult FcPatternGetCharSet(FcPattern *, char *, int, FcCharSet **)
   FcResult FcPatternGetString(FcPattern *, char *, int, FcChar8 **)
-  FcResult FcPatternGetDouble(FcPattern *, char *, int, double *)
+  FcResult FcPatternGetInteger(FcPattern *, char *, int, int *)
+  FcResult FcPatternGetBool(FcPattern *, char *, int, FcBool *)
+
+  void FcValuePrint(FcValue)
   int FcGetVersion()
   int FcUtf8ToUcs4(FcChar8 *, FcChar32 *, int)
-
-  bint FcInit()
-  void FcFini()

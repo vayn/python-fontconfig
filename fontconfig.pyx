@@ -37,7 +37,7 @@ _query = query
 cdef class FcFont:
   '''
   FcF is a Class of FontConfig
-  
+
   This class provides all infomation about font.
   TODO: Reduce the whole class
   '''
@@ -63,6 +63,14 @@ cdef class FcFont:
     cdef int count
     self._blanks = FcConfigGetBlanks(NULL)
     self._pat = FcFreeTypeQuery(<FcChar8*>file, 0, self._blanks, &count)
+
+  def __dealloc__(self):
+    if self._pat is not NULL:
+      FcPatternDestroy(self._pat)
+    self._pat = NULL
+    if self._cs is not NULL:
+      FcCharSetDestroy(self._cs)
+    self._cs = NULL
 
   def __repr__(self):
     try:
