@@ -11,7 +11,7 @@
   :author: Vayn a.k.a VT <vayn@vayn.de>
   :license: GPLv3+, see LICENSE for details.
 '''
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 __docformat__ = 'restructuredtext'
 
 
