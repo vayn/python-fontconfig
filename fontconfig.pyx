@@ -110,6 +110,23 @@ cdef class FcFont:
       l_file = file.encode('utf8')
       self.init(l_file)
 
+  def __getattr__(self, arg):
+    obj = arg.encode('utf8')
+    if self.attr_dict.get(arg) == 'str':
+      if self.__dict__.get(arg) is None:
+        if FcPatternGetString(self._pat, obj, 0, &self.cvar) == Match:
+          ret = FcChar8_to_unicode(self.cvar)
+          self.__dict__[arg] = ret
+    elif self.attr_dict.get(arg) == 'int':
+      if self.__dict__.get(arg) is None:
+        if FcPatternGetInteger(self._pat, obj, 0, &self.ivar) == Match:
+          self.__dict__[arg] = self.ivar
+    elif self.attr_dict.get(arg) == 'bool':
+      if self.__dict__.get(arg) is None:
+        if FcPatternGetBool(self._pat, obj, 0, &self.bvar) == Match:
+          self.__dict__[arg] = self.bvar
+    return self.__dict__[arg]
+
   cdef list _langen(self, obj, obj1):
     '''
     Fragile code generator
@@ -158,24 +175,6 @@ cdef class FcFont:
         return ret
       else:
         return self.__dict__['fullname']
-
-  def __getattr__(self, arg):
-    obj = arg.encode('utf8')
-
-    if self.attr_dict.get(arg) == 'str':
-      if self.__dict__.get(arg) is None:
-        if FcPatternGetString(self._pat, obj, 0, &self.cvar) == Match:
-          ret = FcChar8_to_unicode(self.cvar)
-          self.__dict__[arg] = ret
-    elif self.attr_dict.get(arg) == 'int':
-      if self.__dict__.get(arg) is None:
-        if FcPatternGetInteger(self._pat, obj, 0, &self.ivar) == Match:
-          self.__dict__[arg] = self.ivar
-    elif self.attr_dict.get(arg) == 'bool':
-      if self.__dict__.get(arg) is None:
-        if FcPatternGetBool(self._pat, obj, 0, &self.bvar) == Match:
-          self.__dict__[arg] = self.bvar
-    return self.__dict__[arg]
 
   def lang(self):
     '''Print all languages the font supports'''
