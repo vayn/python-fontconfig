@@ -50,8 +50,8 @@ cdef class FcFont:
     FcBlanks *_blanks
     FcCharSet *_cs
     bytes _file
-    readonly dict __dict__
-    readonly dict attr_dict
+    readonly dict _buf_dict
+    readonly dict _attr_dict
     FcChar8 *cvar
     int ivar
     FcBool bvar
@@ -72,18 +72,18 @@ cdef class FcFont:
     self.init_attrdict()
 
   cdef init_attrdict(self):
-    self.__dict__ = {}
-    self.attr_dict = {}
+    self._buf_dict = {}
+    self._attr_dict = {}
     lst = []
     lst.append(['fontformat', 'foundry', 'capability'])
     lst.append(['slant', 'index', 'weight', 'width', 'spacing'])
     lst.append(['scalable', 'outline', 'decorative'])
     for i in lst[0]:
-      self.attr_dict.update({i: 'str'})
+      self._attr_dict.update({i: 'str'})
     for i in lst[1]:
-      self.attr_dict.update({i: 'int'})
+      self._attr_dict.update({i: 'int'})
     for i in lst[2]:
-      self.attr_dict.update({i: 'bool'})
+      self._attr_dict.update({i: 'bool'})
 
   def __dealloc__(self):
     if self._pat is not NULL:
@@ -112,22 +112,22 @@ cdef class FcFont:
 
   def __getattr__(self, arg):
     obj = arg.encode('utf8')
-    if self.attr_dict.get(arg) == 'str':
-      if self.__dict__.get(arg) is None:
+    if self._attr_dict.get(arg) == 'str':
+      if self._buf_dict.get(arg) is None:
         if FcPatternGetString(self._pat, obj, 0, &self.cvar) == Match:
           ret = FcChar8_to_unicode(self.cvar)
-          self.__dict__[arg] = ret
-    elif self.attr_dict.get(arg) == 'int':
-      if self.__dict__.get(arg) is None:
+          self._buf_dict[arg] = ret
+    elif self._attr_dict.get(arg) == 'int':
+      if self._buf_dict.get(arg) is None:
         if FcPatternGetInteger(self._pat, obj, 0, &self.ivar) == Match:
-          self.__dict__[arg] = self.ivar
-    elif self.attr_dict.get(arg) == 'bool':
-      if self.__dict__.get(arg) is None:
+          self._buf_dict[arg] = self.ivar
+    elif self._attr_dict.get(arg) == 'bool':
+      if self._buf_dict.get(arg) is None:
         if FcPatternGetBool(self._pat, obj, 0, &self.bvar) == Match:
-          self.__dict__[arg] = self.bvar
-    return self.__dict__[arg]
+          self._buf_dict[arg] = self.bvar
+    return self._buf_dict[arg]
 
-  cdef list _langen(self, obj, obj1):
+  cdef list _langen(self, arg):
     '''
     Fragile code generator
 
@@ -135,14 +135,15 @@ cdef class FcFont:
     '''
     cdef:
       int id = 0
-      FcChar8 *var
+      bytes obj = arg.encode('utf8')
+      bytes obj1 = (arg+'lang').encode('utf8')
       list got = []
       list ret = []
     while 1:
-      if FcPatternGetString(self._pat, obj, id, &var) == Match:
-        got.append(FcChar8_to_unicode(var))
-        FcPatternGetString(self._pat, obj1, id, &var)
-        got.append(FcChar8_to_unicode(var))
+      if FcPatternGetString(self._pat, obj, id, &self.cvar) == Match:
+        got.append(FcChar8_to_unicode(self.cvar))
+        FcPatternGetString(self._pat, obj1, id, &self.cvar)
+        got.append(FcChar8_to_unicode(self.cvar))
         ret.append(tuple(got))
         got = []
         id += 1
@@ -151,30 +152,24 @@ cdef class FcFont:
 
   property family:
     def __get__(self):
-      if self.__dict__.get('family') is None:
-        ret = self._langen(FC_FAMILY, FC_FAMILYLANG)
-        self.__dict__['family'] = ret
-        return ret
-      else:
-        return self.__dict__['family']
+      obj = 'family'
+      if self._buf_dict.get(obj) is None:
+        self._buf_dict[obj] = self._langen(obj)
+      return self._buf_dict[obj]
 
   property style:
     def __get__(self):
-      if self.__dict__.get('style') is None:
-        ret = self._langen(FC_STYLE, FC_STYLELANG)
-        self.__dict__['style'] = ret
-        return ret
-      else:
-        return self.__dict__['family']
+      obj = 'style'
+      if self._buf_dict.get(obj) is None:
+        self._buf_dict[obj] = self._langen(obj)
+      return self._buf_dict[obj]
 
   property fullname:
     def __get__(self):
-      if self.__dict__.get('fullname') is None:
-        ret = self._langen(FC_FULLNAME, FC_FULLNAMELANG)
-        self.__dict__['fullname'] = ret
-        return ret
-      else:
-        return self.__dict__['fullname']
+      obj = 'fullname'
+      if self._buf_dict.get(obj) is None:
+        self._buf_dict[obj] = self._langen(obj)
+      return self._buf_dict[obj]
 
   def lang(self):
     '''Print all languages the font supports'''
