@@ -36,9 +36,10 @@ _query = query
 
 cdef class FcFont:
   '''
-  FcF is a Class of FontConfig
+  FcF is a class of FontConfig
 
   This class provides all infomation about font.
+
   TODO: Reduce the whole class
   '''
   # Fontconfig library version
@@ -92,7 +93,8 @@ cdef class FcFont:
       self.init(l_file)
 
   cdef list _langen(self, obj, obj1):
-    '''Fragile code generator
+    '''
+    Fragile code generator
 
     Used by family, style and fullname to avoid repeated code
     '''
