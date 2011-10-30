@@ -36,7 +36,7 @@ query = query
 
 cdef class FcFont:
   '''
-  FcF is a class of FontConfig
+  FcF is a class of Fontconfig
 
   This class provides all infomation about font.
 
@@ -50,6 +50,11 @@ cdef class FcFont:
     FcBlanks *_blanks
     FcCharSet *_cs
     bytes _file
+    public dict __dict__
+    public dict attr_dict
+    FcChar8 *cvar
+    int ivar
+    FcBool bvar
 
   def __cinit__(self, file):
     '''
@@ -64,6 +69,21 @@ cdef class FcFont:
     cdef int count
     self._blanks = FcConfigGetBlanks(NULL)
     self._pat = FcFreeTypeQuery(<FcChar8*>file, 0, self._blanks, &count)
+    self.init_attrdict()
+
+  cdef init_attrdict(self):
+    self.__dict__ = {}
+    self.attr_dict = {}
+    lst = []
+    lst.append(['fontformat', 'foundry', 'capability'])
+    lst.append(['slant', 'index', 'weight', 'width', 'spacing'])
+    lst.append(['scalable', 'outline', 'decorative'])
+    for i in lst[0]:
+      self.attr_dict.update({i: 'str'})
+    for i in lst[1]:
+      self.attr_dict.update({i: 'int'})
+    for i in lst[2]:
+      self.attr_dict.update({i: 'bool'})
 
   def __dealloc__(self):
     if self._pat is not NULL:
@@ -85,9 +105,7 @@ cdef class FcFont:
 
   property file:
     def __get__(self):
-      cdef FcChar8 *var
-      if FcPatternGetString(self._pat, FC_FILE, 0, &var) == Match:
-        return FcChar8_to_unicode(var)
+      return self._file.decode('utf8')
     def __set__(self, file):
       l_file = file.encode('utf8')
       self.init(l_file)
@@ -116,81 +134,48 @@ cdef class FcFont:
 
   property family:
     def __get__(self):
-      return self._langen(FC_FAMILY, FC_FAMILYLANG)
+      if self.__dict__.get('family') is None:
+        ret = self._langen(FC_FAMILY, FC_FAMILYLANG)
+        self.__dict__['family'] = ret
+        return ret
+      else:
+        return self.__dict__['family']
 
   property style:
     def __get__(self):
-      return self._langen(FC_STYLE, FC_STYLELANG)
+      if self.__dict__.get('style') is None:
+        ret = self._langen(FC_STYLE, FC_STYLELANG)
+        self.__dict__['style'] = ret
+        return ret
+      else:
+        return self.__dict__['family']
 
   property fullname:
     def __get__(self):
-      return self._langen(FC_FULLNAME, FC_FULLNAMELANG)
+      if self.__dict__.get('fullname') is None:
+        ret = self._langen(FC_FULLNAME, FC_FULLNAMELANG)
+        self.__dict__['fullname'] = ret
+        return ret
+      else:
+        return self.__dict__['fullname']
 
-  property format:
-    def __get__(self):
-      cdef FcChar8 *var
-      if FcPatternGetString(self._pat, FC_FONTFORMAT, 0, &var) == Match:
-        return FcChar8_to_unicode(var)
+  def __getattr__(self, arg):
+    obj = arg.encode('utf8')
 
-  property foundry:
-    def __get__(self):
-      cdef FcChar8 *var
-      if FcPatternGetString(self._pat, FC_FOUNDRY, 0, &var) == Match:
-        return FcChar8_to_unicode(var)
-
-  property slant:
-    def __get__(self):
-      cdef int var
-      if FcPatternGetInteger(self._pat, FC_SLANT, 0, &var) == Match:
-        return var
-
-  property index:
-    def __get__(self):
-      cdef int var
-      if FcPatternGetInteger(self._pat, FC_INDEX, 0, &var) == Match:
-        return var
-
-  property weight:
-    def __get__(self):
-      cdef int var
-      if FcPatternGetInteger(self._pat, FC_WEIGHT, 0, &var) == Match:
-        return var
-
-  property width:
-    def __get__(self):
-      cdef int var
-      if FcPatternGetInteger(self._pat, FC_WIDTH, 0, &var) == Match:
-        return var
-
-  property spacing:
-    def __get__(self):
-      cdef int var
-      if FcPatternGetInteger(self._pat, FC_SPACING, 0, &var) == Match:
-        return var
-
-  property capability:
-    def __get__(self):
-      cdef FcChar8 *var
-      if FcPatternGetString(self._pat, FC_CAPABILITY, 0, &var) == Match:
-        return FcChar8_to_unicode(var)
-
-  property scalable:
-    def __get__(self):
-      cdef FcBool var
-      if FcPatternGetBool(self._pat, FC_SCALABLE, 0, &var) == Match:
-        return var
-
-  property ouline:
-    def __get__(self):
-      cdef FcBool var
-      if FcPatternGetBool(self._pat, FC_OUTLINE, 0, &var) == Match:
-        return var
-
-  property decorative:
-    def __get__(self):
-      cdef FcBool var
-      if FcPatternGetBool(self._pat, FC_DECORATIVE, 0, &var) == Match:
-        return var
+    if self.attr_dict.get(arg) == 'str':
+      if self.__dict__.get(arg) is None:
+        if FcPatternGetString(self._pat, obj, 0, &self.cvar) == Match:
+          ret = FcChar8_to_unicode(self.cvar)
+          self.__dict__[arg] = ret
+    elif self.attr_dict.get(arg) == 'int':
+      if self.__dict__.get(arg) is None:
+        if FcPatternGetInteger(self._pat, obj, 0, &self.ivar) == Match:
+          self.__dict__[arg] = self.ivar
+    elif self.attr_dict.get(arg) == 'bool':
+      if self.__dict__.get(arg) is None:
+        if FcPatternGetBool(self._pat, obj, 0, &self.bvar) == Match:
+          self.__dict__[arg] = self.bvar
+    return self.__dict__[arg]
 
   def lang(self):
     '''Print all languages the font supports'''
