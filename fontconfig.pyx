@@ -62,6 +62,7 @@ cdef class FcFont:
     '''
     l_file = file.encode('utf8')
     self.init(l_file)
+    self.init_attrdict()
 
   cdef init(self, bytes l_file):
     self._file = l_file
@@ -69,10 +70,9 @@ cdef class FcFont:
     cdef int count
     self._blanks = FcConfigGetBlanks(NULL)
     self._pat = FcFreeTypeQuery(<FcChar8*>file, 0, self._blanks, &count)
-    self.init_attrdict()
+    self._buf_dict = {}
 
   cdef init_attrdict(self):
-    self._buf_dict = {}
     self._attr_dict = {}
     lst = []
     lst.append(['fontformat', 'foundry', 'capability'])
