@@ -1,7 +1,4 @@
 # -*- coding: utf-8
-# @Author: Vayn a.k.a. VT <vayn@vayn.de>
-# @Name: fontconfig.pyx
-# @Date: 2011年10月28日 星期五 08时22分37秒
 '''
   Python-fontconfig
   ~~~~~~~~~~~~~~~~~
@@ -17,6 +14,7 @@
 __version__ = '0.2.0'
 __docformat__ = 'restructuredtext'
 
+
 #------------------------------------------------
 # Imports
 #------------------------------------------------
@@ -24,46 +22,35 @@ __docformat__ = 'restructuredtext'
 from cfontconfig cimport *
 
 include 'fontconfig.pxi'
+include 'factory.pxi'
+
 
 #------------------------------------------------
 # Code
 #------------------------------------------------
 
-class FcInitError(Exception):
-  pass
+# Factory Function
+_query = query
 
-cdef class FontFactory:
-  '''
-  Font Factory
+#
 
-  There is no reason to instantiate it.
-  '''
-
-  # Fontconfig library version
-  __version__ = fc_version()
-
-  def __init__(self):
-    raise FcInitError("Can't init Factory")
-
-cdef class FcFont(FontFactory):
+cdef class FcFont:
   '''
   FcF is a Class of FontConfig
   
   This class provides all infomation about font.
   TODO: Reduce the whole class
   '''
+  # Fontconfig library version
+  __version__ = fc_version()
+
   cdef:
     FcPattern *_pat
     FcBlanks *_blanks
     FcCharSet *_cs
     bytes _file
 
-  def __cinit__(self):
-    if not FcInit():
-      raise FcInitError("Can't init font config library")
-    FcFini()
-
-  def __init__(self, file):
+  def __cinit__(self, file):
     '''
     :param file: The absolute path of the font
     '''
@@ -90,7 +77,7 @@ cdef class FcFont(FontFactory):
   property file:
     def __get__(self):
       cdef FcChar8 *var
-      if FcPatternGetString(self._pat, FC_FONTFORMAT, 0, &var) == Match:
+      if FcPatternGetString(self._pat, FC_FILE, 0, &var) == Match:
         return FcChar8_to_unicode(var)
     def __set__(self, file):
       l_file = file.encode('utf8')
