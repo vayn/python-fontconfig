@@ -30,7 +30,7 @@ include 'factory.pxi'
 #------------------------------------------------
 
 # Factory Function
-_query = query
+query = query
 
 #
 
