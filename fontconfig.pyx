@@ -50,8 +50,8 @@ cdef class FcFont:
     FcBlanks *_blanks
     FcCharSet *_cs
     bytes _file
-    public dict __dict__
-    public dict attr_dict
+    readonly dict __dict__
+    readonly dict attr_dict
     FcChar8 *cvar
     int ivar
     FcBool bvar
