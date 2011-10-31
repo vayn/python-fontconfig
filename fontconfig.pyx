@@ -19,6 +19,7 @@ __docformat__ = 'restructuredtext'
 # Imports
 #------------------------------------------------
 
+from cpython.version cimport PY_MAJOR_VERSION
 from cfontconfig cimport *
 
 include 'fontconfig.pxi'
@@ -91,12 +92,17 @@ cdef class FcFont:
 
   def __repr__(self):
     try:
+      if PY_MAJOR_VERSION < 3:
+        # To avoid `UnicodeEncodeError` in Python 2
+        family = self.family[0][0].encode('utf8')
+      else:
+        family = self.family[0][0]
       value = '<%s: %s>' % (
         self.__class__.__name__,
-        self.family[0][0],
+        family
       )
     except:
-      value = self.__class__.__name__
+      value = self.__class__
     return value
 
   property file:
