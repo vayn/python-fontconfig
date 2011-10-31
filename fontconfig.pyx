@@ -88,9 +88,6 @@ cdef class FcFont:
     if self._pat is not NULL:
       FcPatternDestroy(self._pat)
     self._pat = NULL
-    if self._cs is not NULL:
-      FcCharSetDestroy(self._cs)
-    self._cs = NULL
 
   def __repr__(self):
     try:
@@ -206,3 +203,12 @@ cdef class FcFont:
     if FcCharSetHasChar(self._cs, ucs4_ch):
       ret = 1
     return ret
+
+  def charset_count(self):
+    '''
+    Count the amount of unicode characters in font
+    '''
+    cdef FcChar32 count = 0
+    if FcPatternGetCharSet(self._pat, FC_CHARSET, 0, &self._cs) == Match:
+      count = FcCharSetCount(self._cs)
+    return count
