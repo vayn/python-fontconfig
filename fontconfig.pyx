@@ -60,12 +60,11 @@ cdef class FcFont:
     '''
     :param file: The absolute path of the font
     '''
-    l_file = file.encode('utf8')
-    self.init(l_file)
+    self._file = file.encode('utf8')
+    self.init()
     self.init_attrdict()
 
-  cdef init(self, bytes l_file):
-    self._file = l_file
+  cdef init(self):
     cdef char *file = self._file
     cdef int count
     self._blanks = FcConfigGetBlanks(NULL)
@@ -107,8 +106,8 @@ cdef class FcFont:
     def __get__(self):
       return self._file.decode('utf8')
     def __set__(self, file):
-      l_file = file.encode('utf8')
-      self.init(l_file)
+      self._file = file.encode('utf8')
+      self.init()
 
   def __getattr__(self, arg):
     obj = arg.encode('utf8')
@@ -125,7 +124,10 @@ cdef class FcFont:
       if self._buf_dict.get(arg) is None:
         if FcPatternGetBool(self._pat, obj, 0, &self.bvar) == Match:
           self._buf_dict[arg] = self.bvar
-    return self._buf_dict[arg]
+    try:
+      return self._buf_dict[arg]
+    except KeyError:
+      raise AttributeError("This font doesn't have %s." % arg)
 
   cdef list _langen(self, arg):
     '''
@@ -134,42 +136,45 @@ cdef class FcFont:
     Used by family, style and fullname to avoid repeated code
     '''
     cdef:
-      int id = 0
-      bytes obj = arg.encode('utf8')
-      bytes obj1 = (arg+'lang').encode('utf8')
-      list got = []
-      list ret = []
-    while 1:
-      if FcPatternGetString(self._pat, obj, id, &self.cvar) == Match:
-        got.append(FcChar8_to_unicode(self.cvar))
-        FcPatternGetString(self._pat, obj1, id, &self.cvar)
-        got.append(FcChar8_to_unicode(self.cvar))
-        ret.append(tuple(got))
-        got = []
-        id += 1
-      else:
-        return ret
+      int id
+      bytes obj
+      bytes obj1
+      list got
+      list ret
+    if self._buf_dict.get(arg) is None:
+      id = 0
+      obj = arg.encode('utf8')
+      obj1 = (arg+'lang').encode('utf8')
+      got = []
+      ret = []
+      while 1:
+        if FcPatternGetString(self._pat, obj, id, &self.cvar) == Match:
+          got.append(FcChar8_to_unicode(self.cvar))
+          FcPatternGetString(self._pat, obj1, id, &self.cvar)
+          got.append(FcChar8_to_unicode(self.cvar))
+          ret.append(tuple(got))
+          got = []
+          id += 1
+        else:
+          self._buf_dict[arg] = ret
+          return ret
+    else:
+      return self._buf_dict[arg]
 
   property family:
     def __get__(self):
       obj = 'family'
-      if self._buf_dict.get(obj) is None:
-        self._buf_dict[obj] = self._langen(obj)
-      return self._buf_dict[obj]
+      return self._langen(obj)
 
   property style:
     def __get__(self):
       obj = 'style'
-      if self._buf_dict.get(obj) is None:
-        self._buf_dict[obj] = self._langen(obj)
-      return self._buf_dict[obj]
+      return self._langen(obj)
 
   property fullname:
     def __get__(self):
       obj = 'fullname'
-      if self._buf_dict.get(obj) is None:
-        self._buf_dict[obj] = self._langen(obj)
-      return self._buf_dict[obj]
+      return self._langen(obj)
 
   def lang(self):
     '''Print all languages the font supports'''
