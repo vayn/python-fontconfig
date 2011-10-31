@@ -145,7 +145,7 @@ cdef class FcFont:
     if ret is None:
       id = 0
       obj = arg.encode('utf8')
-      obj1 = (arg+'lang').encode('utf8')
+      obj1 = obj+b'lang'
       got = []
       ret = []
       while 1:
