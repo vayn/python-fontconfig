@@ -141,7 +141,8 @@ cdef class FcFont:
       bytes obj1
       list got
       list ret
-    if self._buf_dict.get(arg) is None:
+    ret = self._buf_dict.get(arg)
+    if ret is None:
       id = 0
       obj = arg.encode('utf8')
       obj1 = (arg+'lang').encode('utf8')
@@ -159,7 +160,7 @@ cdef class FcFont:
           self._buf_dict[arg] = ret
           return ret
     else:
-      return self._buf_dict[arg]
+      return ret
 
   property family:
     def __get__(self):
