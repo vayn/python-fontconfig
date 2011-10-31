@@ -15,3 +15,17 @@ cdef unicode FcChar8_to_unicode(FcChar8 *str):
 cdef int fc_version():
   '''Return version of Fontconfig'''
   return FcGetVersion()
+
+cdef class FcList(list):
+  '''
+  FcList will return a FcFont object when you get an item
+  in the list.
+  '''
+  def __getitem__(self, arg):
+    if isinstance(arg, slice):
+      return FcList(list.__getitem__(self, arg))
+    else:
+      return FcFont(list.__getitem__(self, arg))
+
+  def __delitem(self, arg):
+    FcList(list.__delitem__(self, arg))
