@@ -187,13 +187,11 @@ cdef class FcFont:
     '''Print all infomation of the font in the wild'''
     FcPatternPrint(self._pat)
 
-  cpdef bint has_char(self, unicode ch):
+  cpdef bint has_char(self, ch):
     '''
     Check whether the font supports the given character
 
     :param ch: The character you want to check
-
-    **NOTE:** You should use ``ch = u"..."`` if you are in Python 2
     '''
     cdef:
       int ret = 0
@@ -203,7 +201,6 @@ cdef class FcFont:
 
     if FcPatternGetCharSet(self._pat, FC_CHARSET, 0, &self._cs) != Match:
       return ret
-
     byte_ch = ch.encode('utf8')
     FcUtf8ToUcs4(<FcChar8*>(<char*>byte_ch), &ucs4_ch, 3)
     if FcCharSetHasChar(self._cs, ucs4_ch):
