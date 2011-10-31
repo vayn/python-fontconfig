@@ -40,8 +40,6 @@ cdef class FcFont:
   FcF is a class of Fontconfig
 
   This class provides all infomation about font.
-
-  TODO: Reduce the whole class
   '''
   # Fontconfig library version
   __version__ = fc_version()
