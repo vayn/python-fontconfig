@@ -30,7 +30,7 @@ cdef extern from "fontconfig/fontconfig.h":
   cdef char *FC_OUTLINE 'FC_OUTLINE'
   cdef char *FC_DECORATIVE 'FC_DECORATIVE'
   ctypedef unsigned char FcChar8
-  ctypedef unsigned char FcChar32
+  ctypedef unsigned int FcChar32
   ctypedef bint FcBool
 
   ctypedef enum FcResult 'FcResult':
@@ -76,6 +76,7 @@ cdef extern from "fontconfig/fontconfig.h":
   void FcFontSetDestroy(FcFontSet *)
 
   FcCharSet * FcCharSetCreate()
+  FcChar32 FcCharSetCount(FcCharSet *)
   void FcCharSetDestroy(FcCharSet *)
 
   FcBool FcCharSetHasChar(FcCharSet *, FcChar32)
