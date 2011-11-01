@@ -188,11 +188,18 @@ cdef class FcFont:
     def __get__(self):
       return self._langen(b'fullname')
 
-  def print_lang(self):
+  def get_langs(self):
     '''Print all languages the font supports'''
     cdef FcValue var
+    cdef FcStrSet* langs
+    ret = []
     if FcPatternGet(self._pat, FC_LANG, 0, &var) == Match:
-      FcValuePrint(var)
+      langs = FcLangSetGetLangs(var.u.l)
+      for i in range(langs.num):
+        ret.append(FcChar8_to_unicode(langs.strs[i]))
+    else:
+      ret = None
+    return ret
 
   def print_pattern(self):
     '''Print all infomation of the font in the wild'''
