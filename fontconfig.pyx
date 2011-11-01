@@ -92,30 +92,28 @@ cdef class FcFont:
       self.file = file.encode('utf8')
       self.init()
 
-  def _getattr(self, *args):
+  cdef _getattr(self, name, type):
     cdef:
       int ivar
       FcBool bvar
       FcChar8 *cvar
-    obj = args[0]
-    bobj = obj.encode('utf8')
-    type = args[1]
-
-    if type == 'str' and self._buf.get(obj) is None:
-      if FcPatternGetString(self._pat, bobj, 0, &cvar) == Match:
+      bytes obj
+    obj = name.encode('utf8')
+    if type == 'str' and self._buf.get(name) is None:
+      if FcPatternGetString(self._pat, obj, 0, &cvar) == Match:
         ret = FcChar8_to_unicode(cvar)
-        self._buf[obj] = ret
-    if type == 'int' and self._buf.get(obj) is None:
-      if FcPatternGetInteger(self._pat, bobj, 0, &ivar) == Match:
-        self._buf[obj] = ivar
-    if type == 'bool' and self._buf.get(obj) is None:
-      if FcPatternGetBool(self._pat, bobj, 0, &bvar) == Match:
-        self._buf[obj] = bvar
+        self._buf[name] = ret
+    elif type == 'int' and self._buf.get(name) is None:
+      if FcPatternGetInteger(self._pat, obj, 0, &ivar) == Match:
+        self._buf[name] = ivar
+    elif type == 'bool' and self._buf.get(name) is None:
+      if FcPatternGetBool(self._pat, obj, 0, &bvar) == Match:
+        self._buf[name] = bvar
     try:
-      return self._buf[obj]
+      return self._buf[name]
     except KeyError:
-      self._buf[obj] = None
-      return None
+      # If there isn't one property in the font
+      self._buf[name] = None
 
   property fontformat:
     def __get__(self):
@@ -153,12 +151,8 @@ cdef class FcFont:
     def __get__(self):
       return self._getattr('decorative', 'bool')
 
-  cdef list _langen(self, arg):
-    '''
-    Fragile code generator
-
-    Used by family, style and fullname to avoid repeated code
-    '''
+  cdef _langen(self, arg):
+    # Used by family, style and fullname
     cdef:
       int id
       FcChar8 *cvar
@@ -212,25 +206,24 @@ cdef class FcFont:
     '''Print all infomation of the font in the wild'''
     FcPatternPrint(self._pat)
 
-  cpdef bint has_char(self, ch):
+  def has_char(self, unicode ch):
     '''
     Check whether the font supports the given character
 
     :param ch: The character you want to check
     '''
     cdef:
-      int ret = 0
       int count
       bytes byte_ch
       FcChar32 ucs4_ch
-
     if FcPatternGetCharSet(self._pat, FC_CHARSET, 0, &self._cs) != Match:
-      return ret
+      return False
     byte_ch = ch.encode('utf8')
     FcUtf8ToUcs4(<FcChar8*>(<char*>byte_ch), &ucs4_ch, 3)
     if FcCharSetHasChar(self._cs, ucs4_ch):
-      ret = 1
-    return ret
+      return True
+    else:
+      return False
 
   def count_chars(self):
     '''
