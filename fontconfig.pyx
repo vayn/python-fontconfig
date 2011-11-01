@@ -48,40 +48,22 @@ cdef class FcFont:
     FcPattern *_pat
     FcBlanks *_blanks
     FcCharSet *_cs
-    bytes _file
-    readonly dict _buf_dict
-    readonly dict _attr_dict
-    FcChar8 *cvar
-    int ivar
-    FcBool bvar
+    bytes file
+    dict _buf
 
   def __cinit__(self, file):
     '''
     :param file: The absolute path of the font
     '''
-    self._file = file.encode('utf8')
+    self.file = file.encode('utf8')
     self.init()
-    self.init_attrdict()
 
   cdef init(self):
-    cdef char *file = self._file
+    cdef char *file = self.file
     cdef int count
     self._blanks = FcConfigGetBlanks(NULL)
     self._pat = FcFreeTypeQuery(<FcChar8*>file, 0, self._blanks, &count)
-    self._buf_dict = {}
-
-  cdef init_attrdict(self):
-    self._attr_dict = {}
-    lst = []
-    lst.append(['fontformat', 'foundry', 'capability'])
-    lst.append(['slant', 'index', 'weight', 'width', 'spacing'])
-    lst.append(['scalable', 'outline', 'decorative'])
-    for i in lst[0]:
-      self._attr_dict.update({i: 'str'})
-    for i in lst[1]:
-      self._attr_dict.update({i: 'int'})
-    for i in lst[2]:
-      self._attr_dict.update({i: 'bool'})
+    self._buf = {}
 
   def __dealloc__(self):
     if self._pat is not NULL:
@@ -105,30 +87,71 @@ cdef class FcFont:
 
   property file:
     def __get__(self):
-      return self._file.decode('utf8')
+      return self.file.decode('utf8')
     def __set__(self, file):
-      self._file = file.encode('utf8')
+      self.file = file.encode('utf8')
       self.init()
 
-  def __getattr__(self, arg):
-    obj = arg.encode('utf8')
-    if self._attr_dict.get(arg) == 'str':
-      if self._buf_dict.get(arg) is None:
-        if FcPatternGetString(self._pat, obj, 0, &self.cvar) == Match:
-          ret = FcChar8_to_unicode(self.cvar)
-          self._buf_dict[arg] = ret
-    elif self._attr_dict.get(arg) == 'int':
-      if self._buf_dict.get(arg) is None:
-        if FcPatternGetInteger(self._pat, obj, 0, &self.ivar) == Match:
-          self._buf_dict[arg] = self.ivar
-    elif self._attr_dict.get(arg) == 'bool':
-      if self._buf_dict.get(arg) is None:
-        if FcPatternGetBool(self._pat, obj, 0, &self.bvar) == Match:
-          self._buf_dict[arg] = self.bvar
+  def _getattr(self, *args):
+    cdef:
+      int ivar
+      FcBool bvar
+      FcChar8 *cvar
+    obj = args[0]
+    bobj = obj.encode('utf8')
+    type = args[1]
+
+    if type == 'str' and self._buf.get(obj) is None:
+      if FcPatternGetString(self._pat, bobj, 0, &cvar) == Match:
+        ret = FcChar8_to_unicode(cvar)
+        self._buf[obj] = ret
+    if type == 'int' and self._buf.get(obj) is None:
+      if FcPatternGetInteger(self._pat, bobj, 0, &ivar) == Match:
+        self._buf[obj] = ivar
+    if type == 'bool' and self._buf.get(obj) is None:
+      if FcPatternGetBool(self._pat, bobj, 0, &bvar) == Match:
+        self._buf[obj] = bvar
     try:
-      return self._buf_dict[arg]
+      return self._buf[obj]
     except KeyError:
-      raise AttributeError("This font doesn't have %s." % arg)
+      self._buf[obj] = None
+      return None
+
+  property fontformat:
+    def __get__(self):
+      return self._getattr('fontformat', 'str')
+  property foundry:
+    def __get__(self):
+      return self._getattr('foundry', 'str')
+  property capability:
+    def __get__(self):
+      return self._getattr('capability', 'str')
+
+  property slant:
+    def __get__(self):
+      return self._getattr('slant', 'int')
+  property index:
+    def __get__(self):
+      return self._getattr('index', 'int')
+  property weight:
+    def __get__(self):
+      return self._getattr('weight', 'int')
+  property width:
+    def __get__(self):
+      return self._getattr('width', 'int')
+  property spacing:
+    def __get__(self):
+      return self._getattr('decorative', 'int')
+
+  property scalable:
+    def __get__(self):
+      return self._getattr('scalable', 'bool')
+  property outline:
+    def __get__(self):
+      return self._getattr('outline', 'bool')
+  property decorative:
+    def __get__(self):
+      return self._getattr('decorative', 'bool')
 
   cdef list _langen(self, arg):
     '''
@@ -138,27 +161,28 @@ cdef class FcFont:
     '''
     cdef:
       int id
+      FcChar8 *cvar
       bytes obj
-      bytes obj1
+      bytes lobj
       list got
       list ret
-    ret = self._buf_dict.get(arg)
+    ret = self._buf.get(arg)
     if ret is None:
       id = 0
       obj = arg.encode('utf8')
-      obj1 = obj+b'lang'
+      lobj = obj+b'lang'
       got = []
       ret = []
       while 1:
-        if FcPatternGetString(self._pat, obj, id, &self.cvar) == Match:
-          got.append(FcChar8_to_unicode(self.cvar))
-          FcPatternGetString(self._pat, obj1, id, &self.cvar)
-          got.append(FcChar8_to_unicode(self.cvar))
+        if FcPatternGetString(self._pat, obj, id, &cvar) == Match:
+          got.append(FcChar8_to_unicode(cvar))
+          FcPatternGetString(self._pat, lobj, id, &cvar)
+          got.append(FcChar8_to_unicode(cvar))
           ret.append(tuple(got))
           got = []
           id += 1
         else:
-          self._buf_dict[arg] = ret
+          self._buf[arg] = ret
           return ret
     else:
       return ret
@@ -178,13 +202,13 @@ cdef class FcFont:
       obj = 'fullname'
       return self._langen(obj)
 
-  def lang(self):
+  def print_lang(self):
     '''Print all languages the font supports'''
     cdef FcValue var
     if FcPatternGet(self._pat, FC_LANG, 0, &var) == Match:
       FcValuePrint(var)
 
-  def raw_info(self):
+  def print_pattern(self):
     '''Print all infomation of the font in the wild'''
     FcPatternPrint(self._pat)
 
@@ -208,7 +232,7 @@ cdef class FcFont:
       ret = 1
     return ret
 
-  def charset_count(self):
+  def count_chars(self):
     '''
     Count the amount of characters in font
     '''
