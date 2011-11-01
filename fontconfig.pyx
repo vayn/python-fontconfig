@@ -97,8 +97,8 @@ cdef class FcFont:
       int ivar
       FcBool bvar
       FcChar8 *cvar
-      bytes obj
-    obj = name.encode('utf8')
+      char *obj
+    obj = <char*>name
     if type == 'str' and self._buf.get(name) is None:
       if FcPatternGetString(self._pat, obj, 0, &cvar) == Match:
         ret = FcChar8_to_unicode(cvar)
@@ -117,84 +117,76 @@ cdef class FcFont:
 
   property fontformat:
     def __get__(self):
-      return self._getattr('fontformat', 'str')
+      return self._getattr(b'fontformat', 'str')
   property foundry:
     def __get__(self):
-      return self._getattr('foundry', 'str')
+      return self._getattr(b'foundry', 'str')
   property capability:
     def __get__(self):
-      return self._getattr('capability', 'str')
+      return self._getattr(b'capability', 'str')
 
   property slant:
     def __get__(self):
-      return self._getattr('slant', 'int')
+      return self._getattr(b'slant', 'int')
   property index:
     def __get__(self):
-      return self._getattr('index', 'int')
+      return self._getattr(b'index', 'int')
   property weight:
     def __get__(self):
-      return self._getattr('weight', 'int')
+      return self._getattr(b'weight', 'int')
   property width:
     def __get__(self):
-      return self._getattr('width', 'int')
+      return self._getattr(b'width', 'int')
   property spacing:
     def __get__(self):
-      return self._getattr('decorative', 'int')
+      return self._getattr(b'decorative', 'int')
 
   property scalable:
     def __get__(self):
-      return self._getattr('scalable', 'bool')
+      return self._getattr(b'scalable', 'bool')
   property outline:
     def __get__(self):
-      return self._getattr('outline', 'bool')
+      return self._getattr(b'outline', 'bool')
   property decorative:
     def __get__(self):
-      return self._getattr('decorative', 'bool')
+      return self._getattr(b'decorative', 'bool')
 
-  cdef _langen(self, arg):
+  cdef _langen(self, obj):
     # Used by family, style and fullname
     cdef:
       int id
       FcChar8 *cvar
-      bytes obj
-      bytes lobj
-      list got
-      list ret
-    ret = self._buf.get(arg)
+    ret = self._buf.get(obj)
     if ret is None:
       id = 0
-      obj = arg.encode('utf8')
-      lobj = obj+b'lang'
+      lang = obj+b'lang'
       got = []
       ret = []
       while 1:
         if FcPatternGetString(self._pat, obj, id, &cvar) == Match:
           got.append(FcChar8_to_unicode(cvar))
-          FcPatternGetString(self._pat, lobj, id, &cvar)
+          FcPatternGetString(self._pat, lang, id, &cvar)
           got.append(FcChar8_to_unicode(cvar))
           ret.append(tuple(got))
           got = []
           id += 1
         else:
-          self._buf[arg] = ret
+          self._buf[obj] = ret
           return ret
     else:
       return ret
 
   property family:
     def __get__(self):
-      obj = 'family'
-      return self._langen(obj)
+      return self._langen(b'family')
 
   property style:
     def __get__(self):
-      obj = 'style'
-      return self._langen(obj)
+      return self._langen(b'style')
 
   property fullname:
     def __get__(self):
-      obj = 'fullname'
-      return self._langen(obj)
+      return self._langen(b'fullname')
 
   def print_lang(self):
     '''Print all languages the font supports'''
