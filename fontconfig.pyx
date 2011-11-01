@@ -210,7 +210,7 @@ cdef class FcFont:
 
   def charset_count(self):
     '''
-    Count the amount of unicode characters in font
+    Count the amount of characters in font
     '''
     cdef FcChar32 count = 0
     if FcPatternGetCharSet(self._pat, FC_CHARSET, 0, &self._cs) == Match:
