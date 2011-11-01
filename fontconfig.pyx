@@ -9,9 +9,10 @@
     http://github.com/Vayn/python-fontconfig
 
   :author: Vayn a.k.a VT <vayn@vayn.de>
+  :contributor: lilydjwg
   :license: GPLv3+, see LICENSE for details.
 '''
-__version__ = '0.4.1'
+__version__ = '0.5.0'
 __docformat__ = 'restructuredtext'
 
 
