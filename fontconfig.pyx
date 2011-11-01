@@ -74,15 +74,15 @@ cdef class FcFont:
     try:
       if PY_MAJOR_VERSION < 3:
         # To avoid `UnicodeEncodeError` in Python 2
-        family = self.family[0][0].encode('utf8')
+        family = self.family[0][1].encode('utf8')
       else:
-        family = self.family[0][0]
+        family = self.family[0][1]
       value = '<%s: %s>' % (
         self.__class__.__name__,
         family
       )
-    except:
-      value = self.__class__
+    except IndexError:
+      value = '<%s>' % self.__class__.__name__
     return value
 
   property file:
@@ -160,15 +160,13 @@ cdef class FcFont:
     if ret is None:
       id = 0
       lang = obj+b'lang'
-      got = []
       ret = []
-      while 1:
+      while True:
         if FcPatternGetString(self._pat, obj, id, &cvar) == Match:
-          got.append(FcChar8_to_unicode(cvar))
+          val = FcChar8_to_unicode(cvar)
           FcPatternGetString(self._pat, lang, id, &cvar)
-          got.append(FcChar8_to_unicode(cvar))
-          ret.append(tuple(got))
-          got = []
+          lan = FcChar8_to_unicode(cvar)
+          ret.append((lan, val))
           id += 1
         else:
           self._buf[obj] = ret
