@@ -3,7 +3,7 @@
 # @Name: factory.pxi
 # @Date: 2011年 10月 30日 星期日 15:30:18 CST
 
-def query(lang):
+def query(family='', lang=''):
   '''
   Produce font object list for the queried language
   '''
@@ -15,7 +15,11 @@ def query(lang):
     list lst = []
     FcList ret
 
-  l_lang = (':lang='+lang).encode('utf8')
+  if lang:
+    l_lang = ('%s:lang=%s' % (family, lang))
+  else:
+    l_lang = family
+  l_lang = l_lang.encode('utf-8')
   strpat = <FcChar8*>(<char*>l_lang)
   pat = FcNameParse(strpat)
   os = FcObjectSetBuild(FC_CHARSET, FC_FILE, NULL)
