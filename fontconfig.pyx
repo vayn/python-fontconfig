@@ -74,15 +74,15 @@ cdef class FcFont:
     try:
       if PY_MAJOR_VERSION < 3:
         # To avoid `UnicodeEncodeError` in Python 2
-        family = self.family[0][0].encode('utf8')
+        family = self.family[0][1].encode('utf8')
       else:
-        family = self.family[0][0]
+        family = self.family[0][1]
       value = '<%s: %s>' % (
         self.__class__.__name__,
         family
       )
-    except:
-      value = self.__class__
+    except IndexError:
+      value = '<%s>' % self.__class__.__name__
     return value
 
   property file:
@@ -160,15 +160,13 @@ cdef class FcFont:
     if ret is None:
       id = 0
       lang = obj+b'lang'
-      got = []
       ret = []
-      while 1:
+      while True:
         if FcPatternGetString(self._pat, obj, id, &cvar) == Match:
-          got.append(FcChar8_to_unicode(cvar))
+          val = FcChar8_to_unicode(cvar)
           FcPatternGetString(self._pat, lang, id, &cvar)
-          got.append(FcChar8_to_unicode(cvar))
-          ret.append(tuple(got))
-          got = []
+          lan = FcChar8_to_unicode(cvar)
+          ret.append((lan, val))
           id += 1
         else:
           self._buf[obj] = ret
@@ -188,11 +186,18 @@ cdef class FcFont:
     def __get__(self):
       return self._langen(b'fullname')
 
-  def print_lang(self):
+  def get_languages(self):
     '''Print all languages the font supports'''
     cdef FcValue var
+    cdef FcStrSet* langs
+    ret = []
     if FcPatternGet(self._pat, FC_LANG, 0, &var) == Match:
-      FcValuePrint(var)
+      langs = FcLangSetGetLangs(var.u.l)
+      for i in range(langs.num):
+        ret.append(FcChar8_to_unicode(langs.strs[i]))
+    else:
+      ret = None
+    return ret
 
   def print_pattern(self):
     '''Print all infomation of the font in the wild'''
@@ -208,10 +213,12 @@ cdef class FcFont:
       int count
       bytes byte_ch
       FcChar32 ucs4_ch
+    if len(ch) != 1:
+      raise ValueError('expected a character, but string of length %d found' % len(ch))
+    byte_ch = ch.encode('utf8')
     if FcPatternGetCharSet(self._pat, FC_CHARSET, 0, &self._cs) != Match:
       return False
-    byte_ch = ch.encode('utf8')
-    FcUtf8ToUcs4(<FcChar8*>(<char*>byte_ch), &ucs4_ch, 3)
+    FcUtf8ToUcs4(<FcChar8*>(<char*>byte_ch), &ucs4_ch, len(byte_ch))
     if FcCharSetHasChar(self._cs, ucs4_ch):
       return True
     else:

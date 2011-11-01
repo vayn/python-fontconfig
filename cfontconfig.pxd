@@ -40,18 +40,34 @@ cdef extern from "fontconfig/fontconfig.h":
     FcResultNoId
     FcResultOutOfMemory
 
+  ctypedef struct FcType:
+    pass
   ctypedef struct FcBlanks:
+    pass
+  ctypedef struct FcMatrix:
     pass
   ctypedef struct FcConfig:
     pass
   ctypedef struct FcCharSet:
     pass
+  ctypedef struct FcLangSet:
+    pass
   ctypedef struct FcFontSet:
     int nfont
     int sfont
     FcPattern **fonts
+  ctypedef union FcValue_union:
+    FcChar8 *s
+    int i
+    FcBool b
+    double d
+    FcMatrix *m
+    FcCharSet *c
+    void *f
+    FcLangSet *l
   ctypedef struct FcValue:
-    pass
+    FcType type
+    FcValue_union u
   ctypedef struct FcObjectSet:
     pass
   ctypedef struct FcPattern:
@@ -86,6 +102,16 @@ cdef extern from "fontconfig/fontconfig.h":
   FcResult FcPatternGetInteger(FcPattern *, char *, int, int *)
   FcResult FcPatternGetBool(FcPattern *, char *, int, FcBool *)
 
+  FcStrSet * FcLangSetGetLangs(FcLangSet *ls)
+
   void FcValuePrint(FcValue)
   int FcGetVersion()
   int FcUtf8ToUcs4(FcChar8 *, FcChar32 *, int)
+
+cdef extern from "fcmore.h":
+  ctypedef struct FcStrSet:
+    int ref
+    int num
+    int size
+    FcChar8 **strs
+
