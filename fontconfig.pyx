@@ -92,7 +92,7 @@ cdef class FcFont:
       self.file = file.encode('utf8')
       self.init()
 
-  cdef _getattr(self, name, type):
+  cdef object _getattr(self, bytes name, object type):
     cdef:
       int ivar
       FcBool bvar
@@ -151,7 +151,7 @@ cdef class FcFont:
     def __get__(self):
       return self._getattr(b'decorative', 'bool')
 
-  cdef _langen(self, obj):
+  cdef object _langen(self, bytes obj):
     # Used by family, style and fullname
     cdef:
       int id
