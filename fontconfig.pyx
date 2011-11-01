@@ -89,9 +89,6 @@ cdef class FcFont:
   property file:
     def __get__(self):
       return self.file.decode('utf8')
-    def __set__(self, file):
-      self.file = file.encode('utf8')
-      self.init()
 
   cdef object _getattr(self, bytes name, object type):
     cdef:
