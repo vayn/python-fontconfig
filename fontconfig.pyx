@@ -208,10 +208,12 @@ cdef class FcFont:
       int count
       bytes byte_ch
       FcChar32 ucs4_ch
+    if len(ch) != 1:
+      raise ValueError('expected a character, but string of length %d found' % len(ch))
+    byte_ch = ch.encode('utf8')
     if FcPatternGetCharSet(self._pat, FC_CHARSET, 0, &self._cs) != Match:
       return False
-    byte_ch = ch.encode('utf8')
-    FcUtf8ToUcs4(<FcChar8*>(<char*>byte_ch), &ucs4_ch, 3)
+    FcUtf8ToUcs4(<FcChar8*>(<char*>byte_ch), &ucs4_ch, len(byte_ch))
     if FcCharSetHasChar(self._cs, ucs4_ch):
       return True
     else:
