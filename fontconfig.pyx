@@ -188,7 +188,7 @@ cdef class FcFont:
     def __get__(self):
       return self._langen(b'fullname')
 
-  def get_langs(self):
+  def get_languages(self):
     '''Print all languages the font supports'''
     cdef FcValue var
     cdef FcStrSet* langs
