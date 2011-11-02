@@ -43,7 +43,6 @@ Usage
 >>> fonts = fontconfig.query(family='ubuntu', lang='en')
 
 >>> fonts
->>>
 ['/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-BI.ttf',
  '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf',
  '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-LI.ttf',
@@ -54,7 +53,7 @@ Usage
 >>> font = fonts[0]
 
 >>> font
->>> <FcFont: Ubuntu>
+<FcFont: Ubuntu>
 
 >>> font.
 font.capability     font.fullname       font.slant
@@ -66,24 +65,24 @@ font.fontformat     font.print_pattern
 font.foundry        font.scalable
 
 >>> font.family
->>> [('en', 'Ubuntu')]
+[('en', 'Ubuntu')]
 
 >>> font.foundry
->>> 'unknown'
+'unknown'
 
 >>> font.fontformat
->>> 'TrueType'
+'TrueType'
 
 >>> font.has_char('A')
->>> True
+True
 
 >>> font.file
->>> '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-BI.ttf'
+'/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-BI.ttf'
 
 >>> font = fontconfig.FcFont(font.file)
 
 >>> font.family
->>> [('en', 'Ubuntu')]
+[('en', 'Ubuntu')]
 
 License
 -------
