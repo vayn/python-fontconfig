@@ -24,9 +24,19 @@ Tested on
 Installation
 ------------
 
->>> git clone git://github.com/Vayn/python-fontconfig.git
->>> cd python-fontconfig/
->>> python setup.py install
+From PyPI::
+
+  >>> pip install Python-fontconfig
+
+  or
+
+  >>> easy_install Python-fontconfig 
+
+From GitHub::
+
+  >>> git clone git://github.com/Vayn/python-fontconfig.git
+  >>> cd python-fontconfig/
+  >>> python setup.py install
 
 
 Building C source
