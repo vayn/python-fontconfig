@@ -1,12 +1,12 @@
------------------
+=================
 Python-fontconfig
------------------
+=================
 
 Python bindings for Fontconfig_ library
 
 
 Requirement
-==========
+-----------
 
 - Fontconfig_ **Required**
 - Cython_ (if you want to regenerate C source)
@@ -15,14 +15,14 @@ Requirement
 .. _Fontconfig: http://www.freedesktop.org/wiki/Software/fontconfig
 
 Tested on
-_________
+~~~~~~~~~
 
 - ``Python 2.7.2`` (64-bit)
 - ``Python 3.2.2`` (64-bit)
 
 
 Installation
-============
+------------
 
 >>> git clone git://github.com/Vayn/python-fontconfig.git
 >>> cd python-fontconfig/
@@ -30,18 +30,62 @@ Installation
 
 
 Building C source
-=================
+-----------------
 
 >>> python setup.py build_ext -i 
 
 
-TODO
-====
+Usage
+-----
 
-- Usage doc
+>>> import fontconfig
 
+>>> fonts = fontconfig.query(family='ubuntu', lang='en')
+
+>>> fonts
+>>>
+['/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-BI.ttf',
+ '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf',
+ '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-LI.ttf',
+ '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf',
+ '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-B.ttf',
+ '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-RI.ttf']
+
+>>> font = fonts[0]
+
+>>> font
+>>> <FcFont: Ubuntu>
+
+>>> font.
+font.capability     font.fullname       font.slant
+font.count_chars    font.get_languages  font.spacing
+font.decorative     font.has_char       font.style
+font.family         font.index          font.weight
+font.file           font.outline        font.width
+font.fontformat     font.print_pattern
+font.foundry        font.scalable
+
+>>> font.family
+>>> [('en', 'Ubuntu')]
+
+>>> font.foundry
+>>> 'unknown'
+
+>>> font.fontformat
+>>> 'TrueType'
+
+>>> font.has_char('A')
+>>> True
+
+>>> font.file
+>>> '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-BI.ttf'
+
+>>> font = fontconfig.FcFont(font.file)
+
+>>> font.family
+>>> [('en', 'Ubuntu')]
 
 License
-=======
+-------
 
 This program is released under ``GPLv3`` license, see ``LICENSE`` for more detail.
