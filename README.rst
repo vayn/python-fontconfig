@@ -49,7 +49,7 @@ Testing
 -------
 
 >>> cd test/
->>> python -m unittest -v test.py
+>>> python test.py
 
 
 Usage
