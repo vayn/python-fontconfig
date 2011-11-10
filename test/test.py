@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # vim: set fileencoding=utf-8:
 # @Author: Vayn a.k.a. VT <vayn@vayn.de>
 # @Name: test.py
