@@ -12,7 +12,7 @@
   :contributor: lilydjwg
   :license: GPLv3+, see LICENSE for details.
 '''
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 __docformat__ = 'restructuredtext'
 
 

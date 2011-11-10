@@ -13,7 +13,7 @@ def ext_modules(build=False):
 
 args = dict(
   name='Python-fontconfig',
-  version='0.5.0',
+  version='0.5.1',
   author='Vayn a.k.a. VT',
   author_email='vayn@vayn.de',
   url='https://github.com/Vayn/python-fontconfig',

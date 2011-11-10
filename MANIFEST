@@ -9,3 +9,4 @@ fontconfig.c
 fontconfig.pxi
 fontconfig.pyx
 setup.py
+test/test.py
