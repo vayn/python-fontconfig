@@ -47,14 +47,14 @@ class FcFontTestCase(unittest.TestCase):
   def test_char_in_font(self):
     """Test the given character in font charset"""
     fc = fontconfig.FcFont(self.font.file)
-    char = 'A' if pyver == 3 else u'A'
+    char = 'A' if pyver == 3 else 'A'.decode('utf8')
     self.assertTrue(fc.has_char(char))
 
   @unittest.expectedFailure
   def test_char_not_in_font(self):
     """Test the given character not in font charset"""
     fc = fontconfig.FcFont(self.font.file)
-    char = '永' if pyver == 3 else u'永'
+    char = '永' if pyver == 3 else '永'.decode('utf8')
     self.assertTrue(fc.has_char(char))
 
 
