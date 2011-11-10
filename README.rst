@@ -17,8 +17,8 @@ Requirement
 Tested on
 ~~~~~~~~~
 
-- ``Python 2.7.2`` (64-bit)
-- ``Python 3.2.2`` (64-bit)
+- ``Python 2.7.2`` (32-bit, 64-bit)
+- ``Python 3.2.2`` (32-bit, 64-bit)
 
 
 Installation
@@ -43,6 +43,13 @@ Building C source
 -----------------
 
 >>> python setup.py build_ext -i 
+
+
+Testing
+-------
+
+>>> cd test/
+>>> python -m unittest -v test.py
 
 
 Usage
@@ -93,6 +100,7 @@ True
 
 >>> font.family
 [('en', 'Ubuntu')]
+
 
 License
 -------
