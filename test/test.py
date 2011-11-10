@@ -3,11 +3,17 @@
 # @Author: Vayn a.k.a. VT <vayn@vayn.de>
 # @Name: test.py
 # @Date: 2011年11月10日 星期四 19时13分01秒
-import fontconfig
+import sys
 import unittest
+import fontconfig
 
-condition = input('Have you installed FreeMono font already?(y/n): ')
+pyver = sys.version_info[0]
+if pyver == 3:
+  condition = input('Have you installed FreeMono font already?(y/n): ')
+else:
+  condition = raw_input('Have you installed FreeMono font already?(y/n): ')
 reason = "You don't have the font which tests need"
+
 
 @unittest.skipIf(condition != 'y', reason)
 class FontListTestCase(unittest.TestCase):
@@ -42,15 +48,15 @@ class FcFontTestCase(unittest.TestCase):
   def test_char_in_font(self):
     """Test the given character in font charset"""
     fc = fontconfig.FcFont(self.font.file)
-    res = fc.has_char('A')
-    self.assertTrue(res)
+    char = 'A' if pyver == 3 else u'A'
+    self.assertTrue(fc.has_char(char))
 
   @unittest.expectedFailure
   def test_char_not_in_font(self):
     """Test the given character not in font charset"""
     fc = fontconfig.FcFont(self.font.file)
-    res = fc.has_char('永')
-    self.assertTrue(res)
+    char = '永' if pyver == 3 else u'永'
+    self.assertTrue(fc.has_char(char))
 
 
 if __name__ == '__main__':
