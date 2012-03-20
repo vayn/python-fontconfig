@@ -64,6 +64,8 @@ cdef class FcFont:
     cdef int count
     self._blanks = FcConfigGetBlanks(NULL)
     self._pat = FcFreeTypeQuery(<FcChar8*>file, 0, self._blanks, &count)
+    if self._pat == NULL:
+      raise LookupError('FcFreeTypeQuery failed.')
     self._buf = {}
 
   def __dealloc__(self):
