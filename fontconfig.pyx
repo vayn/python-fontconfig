@@ -12,7 +12,7 @@
   :contributor: lilydjwg
   :license: GPLv3+, see LICENSE for details.
 '''
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 __docformat__ = 'restructuredtext'
 
 
@@ -91,9 +91,6 @@ cdef class FcFont:
   property file:
     def __get__(self):
       return self.file.decode('utf8')
-    def __set__(self, file):
-      self.file = file.encode('utf8')
-      self.init()
 
   cdef object _getattr(self, bytes name, object type):
     cdef:

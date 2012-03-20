@@ -12,12 +12,30 @@ def ext_modules(build=False):
   return ext
 
 args = dict(
-  name='Font Config',
-  version='0.2.0',
+  name='Python-fontconfig',
+  version='0.5.1',
   author='Vayn a.k.a. VT',
   author_email='vayn@vayn.de',
-  description='Python bindings for Fontconfig library',
   url='https://github.com/Vayn/python-fontconfig',
+  license='LICENSE.txt',
+  description='Python bindings for Fontconfig library',
+  long_description=open('README.rst').read(),
+
+  classifiers = [
+      'Development Status :: 4 - Beta',
+      'Intended Audience :: Developers',
+      'Intended Audience :: System Administrators',
+      'License :: OSI Approved :: GNU General Public License (GPL)',
+      'Operating System :: POSIX',
+      'Operating System :: MacOS :: MacOS X',
+      'Topic :: Text Processing :: Fonts',
+      'Topic :: Utilities',
+      'Programming Language :: Python :: 2',
+      'Programming Language :: Python :: 2.7',
+      'Programming Language :: Python :: 3',
+      'Programming Language :: Python :: 3.2',
+      'Programming Language :: Cython',
+  ]
 )
 
 

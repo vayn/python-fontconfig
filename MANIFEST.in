@@ -1,0 +1,6 @@
+include *.txt
+include *.rst
+include *.pyx
+include *.pxd
+include *.pxi
+include *.h

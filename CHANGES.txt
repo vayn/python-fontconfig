@@ -1,0 +1,11 @@
+v0.1.0, October 24, 2011 -- Initial commit
+
+v0.2.0, October 28, 2011
+
+v0.3.0, October 30, 2011
+
+v0.4.0, October 30, 2011
+
+v0.5.0, November 1, 2011
+
+v0.5.1, November 10, 2011 -- Add tests
