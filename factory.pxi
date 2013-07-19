@@ -1,9 +1,8 @@
 # -*- coding: utf-8
 # @Author: Vayn a.k.a. VT <vayn@vayn.de>
 # @Name: factory.pxi
-# @Date: 2011年 10月 30日 星期日 15:30:18 CST
 
-def query(family='', lang=''):
+cpdef query(family='', lang=''):
   '''
   Produce font object list for the queried language
   '''
@@ -13,7 +12,6 @@ def query(family='', lang=''):
     FcFontSet *fs = NULL
     FcObjectSet *os = NULL
     list lst = []
-    FcList ret
 
   if lang:
     l_lang = ('%s:lang=%s' % (family, lang))
@@ -36,7 +34,6 @@ def query(family='', lang=''):
       continue
     if FcPatternGetString(fs.fonts[i], FC_FILE, 0, &file) == Match:
       lst.append((<char*>file).decode('utf8'))
-  ret = FcList(lst)
 
   FcPatternDestroy(pat)
   pat = NULL
@@ -46,4 +43,13 @@ def query(family='', lang=''):
   cs = NULL
   FcFontSetDestroy(fs)
   fs = NULL
-  return ret
+  return lst
+
+def fromName(name):
+  cdef:
+    list names
+  names = query(name)
+  if names:
+    return FcFont(names[0])
+  else:
+    return

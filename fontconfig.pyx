@@ -9,10 +9,10 @@
     http://github.com/Vayn/python-fontconfig
 
   :author: Vayn a.k.a VT <vayn@vayn.de>
-  :contributor: lilydjwg
+  :contributor: lilydjwg <lilydjwg@gmail.com>
   :license: GPLv3+, see LICENSE for details.
 '''
-__version__ = '0.5.1'
+__version__ = '0.6.0'
 __docformat__ = 'restructuredtext'
 
 
@@ -26,21 +26,19 @@ from cfontconfig cimport *
 include 'fontconfig.pxi'
 include 'factory.pxi'
 
+import locale
 
 #------------------------------------------------
 # Code
 #------------------------------------------------
 
-# Factory Function
-query = query
-
-#
+fromName = fromName
 
 cdef class FcFont:
   '''
-  FcF is a class of Fontconfig
+  FcFont is a class of Fontconfig
 
-  This class provides all infomation about font.
+  This class provides all infomation about a font file.
   '''
   # Fontconfig library version
   __version__ = fc_version()
@@ -60,12 +58,12 @@ cdef class FcFont:
     self.init()
 
   cdef init(self):
-    cdef char *file = self.file
     cdef int count
+    cdef char *file = self.file
     self._blanks = FcConfigGetBlanks(NULL)
     self._pat = FcFreeTypeQuery(<FcChar8*>file, 0, self._blanks, &count)
     if self._pat == NULL:
-      raise LookupError('FcFreeTypeQuery failed.')
+      raise LookupError('FcFreeTypeQuery failed')
     self._buf = {}
 
   def __dealloc__(self):
@@ -74,18 +72,11 @@ cdef class FcFont:
     self._pat = NULL
 
   def __repr__(self):
-    try:
-      if PY_MAJOR_VERSION < 3:
-        # To avoid `UnicodeEncodeError` in Python 2
-        family = self.family[0][1].encode('utf8')
-      else:
-        family = self.family[0][1]
-      value = '<%s: %s>' % (
-        self.__class__.__name__,
-        family
-      )
-    except IndexError:
-      value = '<%s>' % self.__class__.__name__
+    family = self.bestname
+    value = '<%s: %s>' % (
+      self.__class__.__name__,
+      family
+    )
     return value
 
   property file:
@@ -169,10 +160,10 @@ cdef class FcFont:
           ret.append((lan, val))
           id += 1
         else:
+          ret = dict(ret)
           self._buf[obj] = ret
-          return ret
-    else:
-      return ret
+          break
+    return ret
 
   property family:
     def __get__(self):
@@ -185,6 +176,28 @@ cdef class FcFont:
   property fullname:
     def __get__(self):
       return self._langen(b'fullname')
+
+  property bestname:
+    def __get__(self):
+      ret = self._buf.get(b'bestname')
+      if ret:
+        return ret
+
+      l = locale.getdefaultlocale()[0].lower().replace('_', '-')
+      try:
+        family = self.family.get(l, None)
+        if family is None:
+          l = l.split('-', 1)[0]
+          family = [y for x, y in self.family.items() if x.startswith(l)]
+          if family:
+            family = family[0]
+          else:
+            family = tuple(self.family.values())[0]
+        ret = family
+      except IndexError:
+        ret = self.file
+      self._buf[b'bestname'] = ret
+      return ret
 
   def get_languages(self):
     '''Print all languages the font supports'''

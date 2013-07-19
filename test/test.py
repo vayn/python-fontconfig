@@ -8,9 +8,9 @@ import fontconfig
 
 pyver = sys.version_info[0]
 if pyver == 3:
-  condition = input('Have you installed FreeMono font already?(y/n): ')
+  condition = input('Have you installed DejaVu Serif font already?(y/n): ')
 else:
-  condition = raw_input('Have you installed FreeMono font already?(y/n): ')
+  condition = raw_input('Have you installed DejaVu Serif font already?(y/n): ')
 reason = "You don't have the font which tests need"
 
 
@@ -18,26 +18,19 @@ reason = "You don't have the font which tests need"
 class FontListTestCase(unittest.TestCase):
   def test_get_list(self):
     """query should give a list for specified font"""
-    fonts = fontconfig.query(family='freemono', lang='en')
+    fonts = fontconfig.query(family='dejavu serif', lang='en')
     self.assertIsInstance(fonts, list)
 
-  def test_get_font_from_list(self):
+  def test_query_font(self):
     """Get FcFont object from list"""
-    fonts = fontconfig.query(family='freemono', lang='en')
+    fonts = fontconfig.query(family='dejavu serif', lang='en')
     font = fonts[0]
-    self.assertIsInstance(font, fontconfig.FcFont)
-
-  def test_get_file_path_from_list_element(self):
-    """Get font path from an element in font list"""
-    fonts = fontconfig.query(family='freemono', lang='en')
-    font = fonts[0]
-    self.assertIsNotNone(font.file)
-
+    self.assertIsInstance(font, str)
 
 @unittest.skipIf(condition != 'y', reason)
 class FcFontTestCase(unittest.TestCase):
-  fonts = fontconfig.query(family='freemono', lang='en')
-  font = fonts[0]
+  fonts = fontconfig.query(family='dejavu serif', lang='en')
+  font = fontconfig.FcFont(fonts[0])
 
   def test_get_object_from_path(self):
     """Get FcFont instance"""
