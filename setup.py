@@ -5,15 +5,15 @@ from distutils.extension import Extension
 
 def ext_modules(build=False):
   if build:
-    source = 'fontconfig.pyx'
+    sources = ['fontconfig.pyx', 'fontconfig.pxi', 'factory.pxi']
   else:
-    source = 'fontconfig.c'
-  ext = [Extension('fontconfig', [source], libraries=["fontconfig"])]
+    sources = ['fontconfig.c']
+  ext = [Extension('fontconfig', sources, libraries=["fontconfig"])]
   return ext
 
 args = dict(
   name='Python-fontconfig',
-  version='0.5.1',
+  version='0.6.0',
   author='Vayn a.k.a. VT',
   author_email='vayn@vayn.de',
   url='https://github.com/Vayn/python-fontconfig',
@@ -34,6 +34,7 @@ args = dict(
       'Programming Language :: Python :: 2.7',
       'Programming Language :: Python :: 3',
       'Programming Language :: Python :: 3.2',
+      'Programming Language :: Python :: 3.3',
       'Programming Language :: Cython',
   ]
 )
