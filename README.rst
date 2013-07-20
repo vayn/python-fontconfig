@@ -19,6 +19,7 @@ Tested on
 
 - ``Python 2.7.2`` (32-bit, 64-bit)
 - ``Python 3.2.2`` (32-bit, 64-bit)
+- ``Python 3.3.2`` (64-bit)
 
 
 Installation
@@ -67,22 +68,25 @@ Usage
  '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-B.ttf',
  '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-RI.ttf']
 
->>> font = fonts[0]
+>>> font = fontconfig.FcFont(fonts[0])
 
 >>> font
 <FcFont: Ubuntu>
 
 >>> font.
-font.capability     font.fullname       font.slant
-font.count_chars    font.get_languages  font.spacing
-font.decorative     font.has_char       font.style
-font.family         font.index          font.weight
-font.file           font.outline        font.width
-font.fontformat     font.print_pattern
-font.foundry        font.scalable
+font.bestname		font.capability		font.fullname
+font.slant		font.count_chars	font.get_languages
+font.spacing		font.decorative		font.has_char
+font.style		font.family		font.index
+font.weight		font.file		font.outline
+font.width		font.fontformat		font.print_pattern
+font.foundry		font.scalable
 
 >>> font.family
-[('en', 'Ubuntu')]
+{'en': 'Ubuntu'}
+
+>>> font.bestname
+{'en': 'Ubuntu'}
 
 >>> font.foundry
 'unknown'
@@ -96,10 +100,13 @@ True
 >>> font.file
 '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-BI.ttf'
 
+>>> fontconfig.fromName('Ubuntu')
+<FcFont: Ubuntu>
+
 >>> font = fontconfig.FcFont(font.file)
 
 >>> font.family
-[('en', 'Ubuntu')]
+{'en': 'Ubuntu'}
 
 
 License
