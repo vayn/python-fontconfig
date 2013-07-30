@@ -118,6 +118,9 @@ To get fonts from a ``.ttc`` (TrueType font collection) file:
 >>> font.count, font.index, font.file, font
 (3, 1, '/home/lilydjwg/.fonts/win/simsun.ttc', <FcFont: 新宋体>)
 
+>>> fontconfig.query('新宋体', with_index=True)
+[('/home/lilydjwg/.fonts/win/simsun.ttc', 1)]
+
 License
 -------
 
