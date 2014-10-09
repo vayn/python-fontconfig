@@ -57,8 +57,8 @@ cpdef query(family='', lang='', with_index=False):
 def fromName(name):
   cdef:
     list names
-  names = query(name)
+  names = query(name, with_index=True)
   if names:
-    return FcFont(names[0])
+    return FcFont(*names[0])
   else:
     return
