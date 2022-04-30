@@ -49,19 +49,21 @@ cdef class FcFont:
     FcCharSet *_cs
     bytes file
     dict _buf
+    int count
+    int _index
 
-  def __cinit__(self, file):
+  def __cinit__(self, file, index=0):
     '''
     :param file: The absolute path of the font
     '''
     self.file = file.encode('utf8')
+    self._index = index
     self.init()
 
   cdef init(self):
-    cdef int count
     cdef char *file = self.file
     self._blanks = FcConfigGetBlanks(NULL)
-    self._pat = FcFreeTypeQuery(<FcChar8*>file, 0, self._blanks, &count)
+    self._pat = FcFreeTypeQuery(<FcChar8*>file, self._index, self._blanks, &self.count)
     if self._pat == NULL:
       raise LookupError('FcFreeTypeQuery failed')
     self._buf = {}
@@ -78,6 +80,10 @@ cdef class FcFont:
       family
     )
     return value
+
+  property count:
+    def __get__(self):
+      return self.count
 
   property file:
     def __get__(self):

@@ -2,7 +2,7 @@
 # @Author: Vayn a.k.a. VT <vayn@vayn.de>
 # @Name: factory.pxi
 
-cpdef query(family='', lang=''):
+cpdef query(family='', lang='', with_index=False):
   '''
   Produce font object list for the queried language
   '''
@@ -20,7 +20,10 @@ cpdef query(family='', lang=''):
   l_lang = l_lang.encode('utf-8')
   strpat = <FcChar8*>(<char*>l_lang)
   pat = FcNameParse(strpat)
-  os = FcObjectSetBuild(FC_CHARSET, FC_FILE, NULL)
+  if with_index:
+    os = FcObjectSetBuild(FC_CHARSET, FC_FILE, FC_INDEX, NULL)
+  else:
+    os = FcObjectSetBuild(FC_CHARSET, FC_FILE, NULL)
   fs = FcFontList(<FcConfig*>0, pat, os)
   if fs is NULL or fs.nfont < 1:
     return lst
@@ -29,11 +32,17 @@ cpdef query(family='', lang=''):
     int i
     FcChar8 *file
     FcCharSet *cs
+    int index
   for i in range(fs.nfont):
     if FcPatternGetCharSet(fs.fonts[i], FC_CHARSET, 0, &cs) != Match:
       continue
     if FcPatternGetString(fs.fonts[i], FC_FILE, 0, &file) == Match:
-      lst.append((<char*>file).decode('utf8'))
+      if with_index:
+        if FcPatternGetInteger(fs.fonts[i], FC_INDEX, 0, &index) != Match:
+          continue
+        lst.append(((<char*>file).decode('utf8'), index))
+      else:
+        lst.append((<char*>file).decode('utf8'))
 
   FcPatternDestroy(pat)
   pat = NULL
@@ -48,8 +57,8 @@ cpdef query(family='', lang=''):
 def fromName(name):
   cdef:
     list names
-  names = query(name)
+  names = query(name, with_index=True)
   if names:
-    return FcFont(names[0])
+    return FcFont(*names[0])
   else:
     return

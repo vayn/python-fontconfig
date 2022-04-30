@@ -108,6 +108,18 @@ True
 >>> font.family
 {'en': 'Ubuntu'}
 
+To get fonts from a ``.ttc`` (TrueType font collection) file:
+
+>>> font = fontconfig.fromName('simsun')
+>>> font.count, font.index, font.file, font
+(3, 0, '/home/lilydjwg/.fonts/win/simsun.ttc', <FcFont: 宋体>)
+
+>>> font = fontconfig.FcFont(font.file, 1)
+>>> font.count, font.index, font.file, font
+(3, 1, '/home/lilydjwg/.fonts/win/simsun.ttc', <FcFont: 新宋体>)
+
+>>> fontconfig.query('新宋体', with_index=True)
+[('/home/lilydjwg/.fonts/win/simsun.ttc', 1)]
 
 License
 -------
